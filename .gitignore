@@ -12,8 +12,11 @@
 /prisma/db.sqlite
 /prisma/db.sqlite-journal
 db.sqlite
-
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
 # next.js
+tmp/
 /.next/
 /out/
 next-env.d.ts
