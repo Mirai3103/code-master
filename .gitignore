@@ -4,13 +4,14 @@
 /node_modules
 /.pnp
 .pnp.js
-
+*/generated/
 # testing
 /coverage
 
 # database
 /prisma/db.sqlite
 /prisma/db.sqlite-journal
+/prisma/generated/
 db.sqlite
 package-lock.json
 pnpm-lock.yaml
