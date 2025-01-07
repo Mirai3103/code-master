@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+generator zod {
+  provider = "zod-prisma-types"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  hashPassword String?
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([provider, providerAccountId])
+}
+ 
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+ 
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@id([identifier, token])
+}
+ 
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([userId, credentialID])
+}
+
+model Language {
+  languageId         Int                 @id @default(autoincrement())
+  languageName       String              @unique(map: "Language_LanguageName_Unique") @db.VarChar(50)
+  version            String              @db.VarChar(50)
+  sourceFileExt      String              @db.VarChar(10)
+  binaryFileExt      String?             @db.VarChar(10)
+  compileCommand     String?             @db.VarChar(100)
+  runCommand         String              @db.VarChar(100)
+  isActive           Boolean             @default(true)
+  canDelete          Boolean             @default(true)
+  monacoCodeLanguage String?             @default("plaintext") @db.VarChar(50)
+  templateCode       String              @default("")
+  problemLanguages   ProblemLanguage[]
+
+  @@map("Language")
+}
+
+model Problem {
+  problemId            String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title                String                 @db.VarChar(255)
+  description          Json?                  @db.Json
+  problemStatement     Json                   @db.Json
+  difficultyLevel      Int                    @default(1) @db.SmallInt
+  timeLimit            Decimal                @default(10) @db.Decimal(6, 2)
+  memoryLimit          Decimal                @default(256) @db.Decimal(6, 2)
+  isPublic             Boolean                @default(true)
+  totalSubmissions     Int                    @default(0)
+  acceptedSubmissions  Int                    @default(0)
+  createdAt            DateTime               @default(now()) @db.Timestamp(6)
+  updatedAt            DateTime               @default(now()) @db.Timestamp(6)
+  deletedAt            DateTime?              @db.Timestamp(6)
+  createdBy            String?                @db.Uuid
+  updatedBy            String?                @db.Uuid
+  deletedBy            String?                @db.Uuid
+  problemLanguages     ProblemLanguage[]
+  problemTags          ProblemTag[]
+  submissions          Submission[]
+  submissionTestcases  SubmissionTestcase[]
+  testcases            Testcase[]
+
+  @@map("Problem")
+}
+
+model ProblemLanguage {
+  problemId    String    @db.Uuid
+  languageId   Int
+  templateCode String?
+  timeLimit    Decimal   @default(10) @db.Decimal(6, 2)
+  memoryLimit  Decimal   @default(256) @db.Decimal(6, 2)
+  language     Language  @relation(fields: [languageId], references: [languageId], onDelete: Cascade, map: "ProblemLanguage_LanguageId_Language_LanguageId_fk")
+  problem      Problem   @relation(fields: [problemId], references: [problemId], onDelete: Cascade, map: "ProblemLanguage_ProblemId_Problem_ProblemId_fk")
+
+  @@id([problemId, languageId], map: "ProblemLanguage_ProblemId_LanguageId_pk")
+  @@map("ProblemLanguage")
+}
+
+model ProblemTag {
+  problemId String   @db.Uuid
+  tagId     String   @db.Uuid
+  problem   Problem  @relation(fields: [problemId], references: [problemId], onDelete: Cascade, map: "ProblemTag_ProblemId_Problem_ProblemId_fk")
+  tag       Tag      @relation(fields: [tagId], references: [tagId], onDelete: Cascade, map: "ProblemTag_TagId_Tag_TagId_fk")
+
+  @@id([problemId, tagId], map: "ProblemTag_ProblemId_TagId_pk")
+  @@map("ProblemTag")
+}
+
+model Submission {
+  submissionId         String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId               String                 @db.Uuid
+  problemId            String                 @db.Uuid
+  languageId           Int
+  code                 String
+  status               String                 @db.VarChar(100)
+  timeExecution        Decimal                @db.Decimal(4, 2)
+  memoryUsage          Decimal                @default(256) @db.Decimal(6, 2)
+  submissionTime       DateTime?              @db.Timestamp(6)
+  createdAt            DateTime               @default(now()) @db.Timestamp(6)
+  updatedAt            DateTime               @default(now()) @db.Timestamp(6)
+  deletedAt            DateTime?              @db.Timestamp(6)
+  createdBy            String?                @db.Uuid
+  updatedBy            String?                @db.Uuid
+  deletedBy            String?                @db.Uuid
+  problem              Problem                @relation(fields: [problemId], references: [problemId], onDelete: NoAction, onUpdate: NoAction, map: "Submission_ProblemId_Problem_ProblemId_fk")
+  submissionTestcases  SubmissionTestcase[]   @relation("SubmissionTestcase_SubmissionId_ToSubmission")
+
+  @@map("Submission")
+}
+
+model SubmissionTestcase {
+  submissionId   String      @db.Uuid
+  testcaseId     String      @db.Uuid
+  status         String      @db.VarChar(100)
+  stdout         String?
+  problemId      String      @db.Uuid
+  runtime        Decimal     @default(10) @db.Decimal(6, 2)
+  memoryUsed     Decimal     @default(256) @db.Decimal(6, 2)
+  problem        Problem     @relation(fields: [problemId], references: [problemId], onDelete: Cascade, map: "SubmissionTestcase_ProblemId_Problem_ProblemId_fk")
+  submission     Submission  @relation("SubmissionTestcase_SubmissionId_ToSubmission", fields: [submissionId], references: [submissionId], onDelete: Cascade, map: "SubmissionTestcase_SubmissionId_Submission_SubmissionId_fk")
+
+  @@id([submissionId, testcaseId], map: "SubmissionTestcase_SubmissionId_TestcaseId_pk")
+  @@map("SubmissionTestcase")
+}
+
+model Tag {
+  tagId        String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tagName      String       @db.VarChar(100)
+  description  String?
+  createdAt    DateTime     @default(now()) @db.Timestamp(6)
+  createdBy    String?      @db.Uuid
+  problemTags  ProblemTag[]
+
+  @@map("Tag")
+}
+
+model Testcase {
+  testCaseId     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  problemId      String    @db.Uuid
+  inputData      String
+  expectedOutput String
+  isSample       Boolean   @default(false)
+  points         Int       @default(0) @db.SmallInt
+  label          String?   @db.VarChar(50)
+  explanation    Json?     @db.Json
+  createdAt      DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt      DateTime? @db.Timestamp(6)
+  createdBy      String?   @db.Uuid
+  updatedBy      String?   @db.Uuid
+  deletedBy      String?   @db.Uuid
+  problem        Problem   @relation(fields: [problemId], references: [problemId], onDelete: Cascade, map: "Testcase_ProblemId_Problem_ProblemId_fk")
+
+  @@map("Testcase")
+}
