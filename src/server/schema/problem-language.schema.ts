@@ -10,8 +10,8 @@ export const bulkLanguagesProblemSchema = z.object({
   addLanguage: z.array(
     language.extend({
       templateCode: z.string().optional(),
-      timeLimit: z.coerce.number().optional(),
-      memoryLimit: z.coerce.number().optional(),
+      timeLimitInMs: z.coerce.number().optional(),
+      memoryLimitInKb: z.coerce.number().optional(),
     }),
   ),
 });

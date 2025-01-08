@@ -167,8 +167,8 @@ export class ProblemService {
           isActive: true,
           problemLanguages: {
             select: {
-              timeLimit: true,
-              memoryLimit: true,
+              timeLimitInMs: true,
+              memoryLimitInKb: true,
             },
           },
         },
@@ -179,8 +179,8 @@ export class ProblemService {
           name: lang.languageName,
           version: lang.version,
           isActive: lang.isActive,
-          timeLimit: lang.problemLanguages[0]?.timeLimit ?? null,
-          memoryLimit: lang.problemLanguages[0]?.memoryLimit ?? null,
+          timeLimitInMs: lang.problemLanguages[0]?.timeLimitInMs ?? null,
+          memoryLimitInKb: lang.problemLanguages[0]?.memoryLimitInKb ?? null,
           isInProblem: lang.problemLanguages.length > 0,
         })),
       );
@@ -202,8 +202,8 @@ export class ProblemService {
           templateCode: true,
           problemLanguages: {
             select: {
-              timeLimit: true,
-              memoryLimit: true,
+              timeLimitInMs: true,
+              memoryLimitInKb: true,
               templateCode: true,
             },
           },
@@ -215,8 +215,8 @@ export class ProblemService {
           name: lang.languageName,
           version: lang.version,
           isActive: lang.isActive,
-          timeLimit: lang.problemLanguages[0]?.timeLimit ?? null,
-          memoryLimit: lang.problemLanguages[0]?.memoryLimit ?? null,
+          timeLimitInMs: lang.problemLanguages[0]?.timeLimitInMs ?? null,
+          memoryLimitInKb: lang.problemLanguages[0]?.memoryLimitInKb ?? null,
           monacoCodeLanguage: lang.monacoCodeLanguage,
           templateCode:
             lang.problemLanguages[0]?.templateCode ?? lang.templateCode,
@@ -239,8 +239,8 @@ export class ProblemService {
           problemId,
           languageId: lang.languageId,
           templateCode: lang.templateCode,
-          timeLimit: lang.timeLimit,
-          memoryLimit: lang.memoryLimit,
+          timeLimitInMs: lang.timeLimitInMs,
+          memoryLimitInKb: lang.memoryLimitInKb,
         })),
       }),
     ]);
@@ -272,8 +272,8 @@ export class ProblemService {
         title: true,
         difficultyLevel: true,
         isPublic: true,
-        timeLimit: true,
-        memoryLimit: true,
+        timeLimitInMs: true,
+        memoryLimitInKb: true,
       },
     });
   }

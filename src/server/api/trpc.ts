@@ -12,7 +12,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { auth } from "@/server/auth";
-import { db } from "@/server/db";
+import { db } from "@/server/database";
 import { TagService } from "../service/tag.service";
 import { SubmissionService } from "../service/submission.service";
 import { executionServiceClient } from "../grpc";

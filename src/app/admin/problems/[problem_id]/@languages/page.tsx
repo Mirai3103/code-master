@@ -17,8 +17,8 @@ export default async function ProblemLanguagesPage({
   ]);
   languages = languages.map((language) => ({
     ...language,
-    timeLimit: language.timeLimit || problem!.timeLimit,
-    memoryLimit: language.memoryLimit || problem!.memoryLimit,
+    timeLimitInMs: language.timeLimitInMs || problem!.timeLimitInMs,
+    memoryLimitInKb: language.memoryLimitInKb || problem!.memoryLimitInKb,
   }));
   return (
     <div>

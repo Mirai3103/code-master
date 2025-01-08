@@ -88,13 +88,13 @@ export const columns: ColumnDef<LanguageOfProblem>[] = [
     },
   },
   {
-    id: "timeLimit",
-    accessorKey: "timeLimit",
+    id: "timeLimitInMs",
+    accessorKey: "timeLimitInMs",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Giới hạn thời gian(Giây)" />
     ),
     cell: ({ row }) => (
-      <span className="max-w-6">{row.getValue("timeLimit")}</span>
+      <span className="max-w-6">{row.getValue("timeLimitInMs")}</span>
     ),
     meta: {
       className: cn(
@@ -106,13 +106,13 @@ export const columns: ColumnDef<LanguageOfProblem>[] = [
     },
   },
   {
-    id: "memoryLimit",
-    accessorKey: "memoryLimit",
+    id: "memoryLimitInKb",
+    accessorKey: "memoryLimitInKb",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Giới hạn bộ nhớ(MB)" />
     ),
     cell: ({ row }) => (
-      <span className="max-w-6">{row.getValue("memoryLimit")}</span>
+      <span className="max-w-6">{row.getValue("memoryLimitInKb")}</span>
     ),
     meta: {
       className: cn(

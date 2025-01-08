@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(100) NOT NULL,
     "name" TEXT,
     "email" TEXT NOT NULL,
     "emailVerified" TIMESTAMP(3),
@@ -14,7 +14,7 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Account" (
-    "userId" TEXT NOT NULL,
+    "userId" VARCHAR(100) NOT NULL,
     "type" TEXT NOT NULL,
     "provider" TEXT NOT NULL,
     "providerAccountId" TEXT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE "Account" (
 -- CreateTable
 CREATE TABLE "Session" (
     "sessionToken" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "userId" VARCHAR(100) NOT NULL,
     "expires" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL
@@ -52,7 +52,7 @@ CREATE TABLE "VerificationToken" (
 -- CreateTable
 CREATE TABLE "Authenticator" (
     "credentialID" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "userId" VARCHAR(100) NOT NULL,
     "providerAccountId" TEXT NOT NULL,
     "credentialPublicKey" TEXT NOT NULL,
     "counter" INTEGER NOT NULL,
@@ -87,17 +87,17 @@ CREATE TABLE "Problem" (
     "description" JSON,
     "problemStatement" JSON NOT NULL,
     "difficultyLevel" SMALLINT NOT NULL DEFAULT 1,
-    "timeLimit" DECIMAL(6,2) NOT NULL DEFAULT 10,
-    "memoryLimit" DECIMAL(6,2) NOT NULL DEFAULT 256,
+    "timeLimitInMs" INTEGER NOT NULL DEFAULT 10,
+    "memoryLimitInKb" INTEGER NOT NULL DEFAULT 256,
     "isPublic" BOOLEAN NOT NULL DEFAULT true,
     "totalSubmissions" INTEGER NOT NULL DEFAULT 0,
     "acceptedSubmissions" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(6),
-    "createdBy" UUID,
-    "updatedBy" UUID,
-    "deletedBy" UUID,
+    "createdBy" VARCHAR(100),
+    "updatedBy" VARCHAR(100),
+    "deletedBy" VARCHAR(100),
 
     CONSTRAINT "Problem_pkey" PRIMARY KEY ("problemId")
 );
@@ -107,8 +107,8 @@ CREATE TABLE "ProblemLanguage" (
     "problemId" UUID NOT NULL,
     "languageId" INTEGER NOT NULL,
     "templateCode" TEXT,
-    "timeLimit" DECIMAL(6,2) NOT NULL DEFAULT 10,
-    "memoryLimit" DECIMAL(6,2) NOT NULL DEFAULT 256,
+    "timeLimitInMs" INTEGER NOT NULL DEFAULT 10,
+    "memoryLimitInKb" INTEGER NOT NULL DEFAULT 256,
 
     CONSTRAINT "ProblemLanguage_ProblemId_LanguageId_pk" PRIMARY KEY ("problemId","languageId")
 );
@@ -129,15 +129,15 @@ CREATE TABLE "Submission" (
     "languageId" INTEGER NOT NULL,
     "code" TEXT NOT NULL,
     "status" VARCHAR(100) NOT NULL,
-    "timeExecution" DECIMAL(4,2) NOT NULL,
-    "memoryUsage" DECIMAL(6,2) NOT NULL DEFAULT 256,
+    "timeExecutionInMs" INTEGER NOT NULL,
+    "memoryUsageInKb" INTEGER NOT NULL DEFAULT 256,
     "submissionTime" TIMESTAMP(6),
     "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(6),
-    "createdBy" UUID,
-    "updatedBy" UUID,
-    "deletedBy" UUID,
+    "createdBy" VARCHAR(100),
+    "updatedBy" VARCHAR(100),
+    "deletedBy" VARCHAR(100),
 
     CONSTRAINT "Submission_pkey" PRIMARY KEY ("submissionId")
 );
@@ -149,8 +149,8 @@ CREATE TABLE "SubmissionTestcase" (
     "status" VARCHAR(100) NOT NULL,
     "stdout" TEXT,
     "problemId" UUID NOT NULL,
-    "runtime" DECIMAL(6,2) NOT NULL DEFAULT 10,
-    "memoryUsed" DECIMAL(6,2) NOT NULL DEFAULT 256,
+    "runtimeInMs" INTEGER NOT NULL DEFAULT 10,
+    "memoryUsedInKb" INTEGER NOT NULL DEFAULT 256,
 
     CONSTRAINT "SubmissionTestcase_SubmissionId_TestcaseId_pk" PRIMARY KEY ("submissionId","testcaseId")
 );
@@ -161,7 +161,7 @@ CREATE TABLE "Tag" (
     "tagName" VARCHAR(100) NOT NULL,
     "description" TEXT,
     "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdBy" UUID,
+    "createdBy" VARCHAR(100),
 
     CONSTRAINT "Tag_pkey" PRIMARY KEY ("tagId")
 );
@@ -179,9 +179,9 @@ CREATE TABLE "Testcase" (
     "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(6),
-    "createdBy" UUID,
-    "updatedBy" UUID,
-    "deletedBy" UUID,
+    "createdBy" VARCHAR(100),
+    "updatedBy" VARCHAR(100),
+    "deletedBy" VARCHAR(100),
 
     CONSTRAINT "Testcase_pkey" PRIMARY KEY ("testCaseId")
 );

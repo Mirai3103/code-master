@@ -27,8 +27,8 @@ export class SubmissionService extends AbstractService {
     const problem = await this.prisma.problem.findUnique({
       where: { problemId: problemId },
       select: {
-        timeLimit: true,
-        memoryLimit: true,
+        timeLimitInMs: true,
+        memoryLimitInKb: true,
       },
     });
 
@@ -40,8 +40,8 @@ export class SubmissionService extends AbstractService {
     const problemLanguage = await this.prisma.problemLanguage.findFirst({
       where: { languageId, problemId: problemId },
       select: {
-        memoryLimit: true,
-        timeLimit: true,
+        memoryLimitInKb: true,
+        timeLimitInMs: true,
         language: {
           select: {
             binaryFileExt: true,
@@ -86,10 +86,11 @@ export class SubmissionService extends AbstractService {
         source_file_ext: problemLanguage.language.sourceFileExt || "",
       }),
       memory_limit:
-        (problemLanguage.memoryLimit?.toNumber() ||
-          problem.memoryLimit?.toNumber()) * 1024,
+        (problemLanguage.memoryLimitInKb?.toNumber() ||
+          problem.memoryLimitInKb?.toNumber()) * 1024,
       time_limit:
-        problemLanguage.timeLimit?.toNumber() || problem.timeLimit?.toNumber(),
+        problemLanguage.timeLimitInMs?.toNumber() ||
+        problem.timeLimitInMs?.toNumber(),
       test_cases: problemTestCases.map(
         (testCase) =>
           new TestCase({

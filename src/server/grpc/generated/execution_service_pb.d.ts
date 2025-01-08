@@ -173,8 +173,8 @@ export namespace Submission {
     id: string;
     language?: Language.AsObject;
     code: string;
-    timeLimit: number;
-    memoryLimit: number;
+    timeLimitInMs: number;
+    memoryLimitInKb: number;
     testCasesList: Array<TestCase.AsObject>;
   };
 }

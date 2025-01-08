@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { DifficultyLevel } from "./enum";
+import { DifficultyLevel, parseDifficultyLevel } from "./enum";
 import { paginationQuerySchema } from "./pagination.schema";
 import { type Problem as PrismaProblem } from "@prisma/client";
 export const createProblemSchema = z.object({
@@ -16,18 +16,23 @@ export const createProblemSchema = z.object({
     .refine((val) => val != null, "Đề bài không được để trống"),
 
   difficultyLevel: z
-    .nativeEnum(DifficultyLevel, {
-      errorMap: () => ({ message: "Mức độ khó không hợp lệ" }),
-    })
+    .preprocess(
+      (val) => {
+        return parseDifficultyLevel(val as string);
+      },
+      z.nativeEnum(DifficultyLevel, {
+        errorMap: () => ({ message: "Mức độ khó không hợp lệ" }),
+      }),
+    )
     .default(DifficultyLevel.EASY),
 
-  timeLimit: z
+  timeLimitInMs: z
     .number()
     .min(0, "Giới hạn thời gian không được âm")
     .max(100, "Giới hạn thời gian không được vượt quá 100 giây")
     .default(10),
 
-  memoryLimit: z
+  memoryLimitInKb: z
     .number()
     .min(0, "Giới hạn bộ nhớ không được âm")
     .max(1024, "Giới hạn bộ nhớ không được vượt quá 1024MB")
@@ -38,14 +43,12 @@ export const createProblemSchema = z.object({
     .default(true)
     .describe("Trạng thái công khai của bài toán"),
 
-  tags: z
-    .array(
-      z.object({
-        tagId: z.string().min(1, "Id thẻ không được để trống"),
-        name: z.string().optional(),
-      }),
-    )
-    .min(1, "Bài toán cần ít nhất một thẻ"),
+  tags: z.array(
+    z.object({
+      tagId: z.string().min(1, "Id thẻ không được để trống"),
+      name: z.string().optional(),
+    }),
+  ),
 });
 
 export const updateProblemSchema = createProblemSchema

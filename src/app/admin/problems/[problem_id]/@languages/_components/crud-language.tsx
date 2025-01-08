@@ -96,8 +96,8 @@ function Actions({
       })),
       addLanguage: needAdd.map((id) => ({
         languageId: parseInt(id + ""),
-        timeLimit: problem.timeLimit?.toNumber(),
-        memoryLimit: problem.memoryLimit?.toNumber(),
+        timeLimitInMs: problem.timeLimitInMs?.toNumber(),
+        memoryLimitInKb: problem.memoryLimitInKb?.toNumber(),
       })),
     };
     await mutateAsync(payload);

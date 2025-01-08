@@ -45,8 +45,8 @@ interface ProblemFormData extends CreateProblemDTO {
 const DEFAULT_VALUES: ProblemFormData = {
   title: "",
   difficultyLevel: DifficultyLevel.EASY,
-  timeLimit: 10,
-  memoryLimit: 256,
+  timeLimitInMs: 10,
+  memoryLimitInKb: 256,
   isPublic: true,
   selectedTags: [],
   newTags: [],
@@ -99,12 +99,12 @@ export default function CreateForm({
         });
       },
     });
-
+  console.log("form", form.formState.errors);
   const onSubmit = async () => {
     const values = form.getValues();
     const payload = {
-      memoryLimit: values.memoryLimit,
-      timeLimit: values.timeLimit,
+      memoryLimitInKb: values.memoryLimitInKb,
+      timeLimitInMs: values.timeLimitInMs,
       difficultyLevel: values.difficultyLevel,
       isPublic: values.isPublic,
       title: values.title,
@@ -222,7 +222,7 @@ export default function CreateForm({
             {/* Time Limit */}
             <FormField
               control={form.control}
-              name="timeLimit"
+              name="timeLimitInMs"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Giới hạn thời gian (giây)</FormLabel>
@@ -241,7 +241,7 @@ export default function CreateForm({
             {/* Memory Limit */}
             <FormField
               control={form.control}
-              name="memoryLimit"
+              name="memoryLimitInKb"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Giới hạn bộ nhớ (MB)</FormLabel>

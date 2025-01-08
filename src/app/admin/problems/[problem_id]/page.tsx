@@ -26,8 +26,8 @@ export default async function EditProblem({
               label: tag.tag.tagName,
             })) || [],
           newTags: [],
-          timeLimit: Number(problem.timeLimit.toNumber()),
-          memoryLimit: Number(problem.memoryLimit.toNumber()),
+          timeLimitInMs: Number(problem.timeLimitInMs.toNumber()),
+          memoryLimitInKb: Number(problem.memoryLimitInKb.toNumber()),
           problemStatement: problem.problemStatement as object,
 
         }
