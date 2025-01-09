@@ -25,8 +25,8 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  Role Role[]
+  rules     Json?    @db.JsonB
+  Role      Role[]
 }
 
 model Account {
@@ -88,16 +88,15 @@ model Role {
   roleName    String   @unique
   description String?
   users       User[]
-  rules       Json     @db.JsonB
+  rules       Json?    @db.JsonB
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
 
-model Subject {
-  subjectId   String   @id @db.VarChar(100)
-  subjectName String   @unique
-  description String?
-  fields      String[] @default([])
+model Resource {
+  resourceId   String   @id @db.VarChar(100)
+  resourceName String   @unique
+  description  String?
+  fields       String[] @default([])
 }
 
 model Action {
