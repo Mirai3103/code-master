@@ -53,7 +53,7 @@ export default function TestcaseRunner({
               </pre>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-4">
               <div className="flex-1">
                 <div className="mb-2 text-sm text-gray-500">
                   Expected Output

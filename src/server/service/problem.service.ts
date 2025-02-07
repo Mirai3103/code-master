@@ -154,38 +154,43 @@ export class ProblemService {
   }
 
   async getFullLanguagesWithStatusForProblem(problemId: string) {
-    return this.prisma.language
-      .findMany({
-        where: {
-          isActive: true,
-          problemLanguages: { some: { problemId } },
-        },
-        select: {
-          languageId: true,
-          languageName: true,
-          version: true,
-          isActive: true,
-          problemLanguages: {
-            select: {
-              timeLimitInMs: true,
-              memoryLimitInKb: true,
-            },
+    const languages = await this.prisma.language.findMany({
+      select: {
+        languageId: true,
+        languageName: true,
+        version: true,
+        isActive: true,
+        problemLanguages: {
+          where: {
+            problemId: problemId,
+          },
+          select: {
+            timeLimitInMs: true,
+            memoryLimitInKb: true,
           },
         },
-      })
-      .then((languages) =>
-        languages.map((lang) => ({
-          languageId: lang.languageId,
-          name: lang.languageName,
-          version: lang.version,
-          isActive: lang.isActive,
-          timeLimitInMs: lang.problemLanguages[0]?.timeLimitInMs ?? null,
-          memoryLimitInKb: lang.problemLanguages[0]?.memoryLimitInKb ?? null,
-          isInProblem: lang.problemLanguages.length > 0,
-        })),
-      );
-  }
+      },
+      where: {
+        isActive: true,
+      },
+    });
 
+    return languages.map((lang) => ({
+      languageId: lang.languageId,
+      name: lang.languageName,
+      version: lang.version,
+      isActive: lang.isActive,
+      timeLimitInMs:
+        lang.problemLanguages.length > 0
+          ? lang.problemLanguages[0]!.timeLimitInMs
+          : null,
+      memoryLimitInKb:
+        lang.problemLanguages.length > 0
+          ? lang.problemLanguages[0]!.memoryLimitInKb
+          : null,
+      isInProblem: lang.problemLanguages.length > 0,
+    }));
+  }
   async getActiveLanguagesForProblem(problemId: string) {
     return this.prisma.language
       .findMany({

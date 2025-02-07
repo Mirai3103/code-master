@@ -86,11 +86,8 @@ export class SubmissionService extends AbstractService {
         source_file_ext: problemLanguage.language.sourceFileExt || "",
       }),
       memory_limit:
-        (problemLanguage.memoryLimitInKb?.toNumber() ||
-          problem.memoryLimitInKb?.toNumber()) * 1024,
-      time_limit:
-        problemLanguage.timeLimitInMs?.toNumber() ||
-        problem.timeLimitInMs?.toNumber(),
+        (problemLanguage.memoryLimitInKb || problem.memoryLimitInKb) * 1024,
+      time_limit: problemLanguage.timeLimitInMs || problem.timeLimitInMs,
       test_cases: problemTestCases.map(
         (testCase) =>
           new TestCase({

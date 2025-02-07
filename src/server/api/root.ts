@@ -4,6 +4,8 @@ import { languageRouter } from "./routers/language";
 import { problemRouter } from "./routers/problem";
 import { testcaseRouter } from "./routers/testcase";
 import { submissionRouter } from "./routers/submission";
+import { userRouter } from "./routers/user";
+import { roleRouter } from "./routers/role";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +18,8 @@ export const appRouter = createTRPCRouter({
   problems: problemRouter,
   testcases: testcaseRouter,
   submissions: submissionRouter,
+  users: userRouter,
+  roles: roleRouter,
 });
 
 // export type definition of API

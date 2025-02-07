@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/app/_lib/utils";
 
 // Improved type definitions
 export interface FancyMultiSelectOption {
@@ -46,6 +47,7 @@ interface FancyMultiSelectProps {
   withCreateNew?: boolean;
   onCreateNew?: (label: string) => FancyMultiSelectOption;
   createNewProps?: CreateNewProps;
+  floatingList?: boolean;
 }
 
 // Separate Dialog Component
@@ -118,6 +120,7 @@ export const FancyMultiSelect = React.forwardRef<
       withCreateNew,
       onCreateNew,
       createNewProps = {},
+      floatingList = true,
     },
     ref,
   ) => {
@@ -243,7 +246,10 @@ export const FancyMultiSelect = React.forwardRef<
           <CommandList>
             {open && availableOptions.length > 0 && (
               <div
-                className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95"
+                className={cn(
+                  "top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95",
+                  floatingList && "absolute",
+                )}
                 role="listbox"
               >
                 <CommandGroup className="h-full max-h-[200px] overflow-auto">

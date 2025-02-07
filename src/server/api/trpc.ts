@@ -19,6 +19,9 @@ import { executionServiceClient } from "../grpc";
 import { LanguageService } from "../service/language.service";
 import { ProblemService } from "../service/problem.service";
 import { TestcaseService } from "../service/testcase.service";
+import { UserService } from "../service/user.service";
+import { RoleService } from "../service/role.service";
+import { PermissionService } from "../service/permission.service";
 
 /**
  * 1. CONTEXT
@@ -45,6 +48,9 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
       problem: new ProblemService(db, tagService),
       testcase: new TestcaseService(db),
       submission: submissionService,
+      user: new UserService(db),
+      role: new RoleService(db),
+      permission: new PermissionService(db),
     },
     grpc: {
       executionServiceClient,

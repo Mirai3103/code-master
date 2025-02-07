@@ -5,8 +5,7 @@ import {
   TaskItem,
   HorizontalRule,
   StarterKit,
-  MarkdownExtension,
-} from "novel/extensions";
+} from "novel";
 
 import { cx } from "class-variance-authority";
 
@@ -87,5 +86,5 @@ export const defaultExtensions = [
   taskList,
   taskItem,
   horizontalRule,
-  MarkdownExtension.configure({}),
+  // MarkdownExtension.configure({}),
 ];

@@ -14,7 +14,10 @@ export default async function ProblemTestcasesPage({
   params: Promise<{ problem_id: string }>;
 }) {
   const problemId = (await params).problem_id;
-  const testcase = await trpc.testcases.getTestcases({ problemId });
+  const testcase = await trpc.testcases.getTestcases({
+    problemId,
+    withAllTestcases: true,
+  });
   return (
     <div>
       <div className="flex flex-col gap-2">

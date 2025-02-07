@@ -31,8 +31,7 @@ export default function CrudLanguage({ languages, problem }: Props) {
       emptySlot={
         <p className="flex items-center justify-center gap-x-2">
           <IconAlertTriangleFilled size={18} className="text-red-500" />
-          Bạn hiện không có trường hợp kiểm thử nào cho thử thách này. Hãy thêm
-          ít nhất một trường hợp kiểm thử.
+          Bạn hiện không có ngôn ngữ lập trình nào
         </p>
       }
     >
@@ -96,8 +95,8 @@ function Actions({
       })),
       addLanguage: needAdd.map((id) => ({
         languageId: parseInt(id + ""),
-        timeLimitInMs: problem.timeLimitInMs?.toNumber(),
-        memoryLimitInKb: problem.memoryLimitInKb?.toNumber(),
+        timeLimitInMs: problem.timeLimitInMs,
+        memoryLimitInKb: problem.memoryLimitInKb,
       })),
     };
     await mutateAsync(payload);

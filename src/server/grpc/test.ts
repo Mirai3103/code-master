@@ -10,7 +10,7 @@ async function main() {
   // Khởi tạo client
 
   const client = new ExecutionServiceClient(
-    "localhost:50051",
+    "103.82.194.100:50051",
     grpc.credentials.createInsecure(),
   );
 

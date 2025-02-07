@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { generateHTML } from "@tiptap/core";
-import { StarterKit } from "novel/extensions";
+import { StarterKit } from "novel";
 import React from "react";
 import { type ProblemDetail } from "./type";
 import { Badge } from "@/components/ui/badge";

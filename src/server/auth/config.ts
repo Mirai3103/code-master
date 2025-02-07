@@ -53,7 +53,25 @@ export const authConfig = {
       },
     }),
   ],
-  adapter: PrismaAdapter(db),
+  adapter: {
+    ...PrismaAdapter(db),
+    createUser: async (data) => {
+      return await db.user.create({
+        data: {
+          id: data.id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          email: data.email,
+          emailVerified: new Date(),
+          image: data.image!,
+          name: data.name!,
+          Role: {
+            connect: { roleId: "everyone" },
+          },
+        },
+      });
+    },
+  },
   callbacks: {
     session: ({ session, user }) => ({
       ...session,

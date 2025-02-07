@@ -18,57 +18,58 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { nanoid } from "nanoid";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { LuLoader as Loader2 } from "react-icons/lu";
 import {
-  type CreateTagDTO,
-  createTagSchema,
-  type Tag,
-} from "@/server/schema/tag.schema";
+  type CreateRoleInput,
+  createRoleSchema,
+  type Role,
+} from "@/server/schema/role";
 import { trpc } from "@/trpc/react";
 
 interface Props {
-  currentRow?: Tag;
+  currentRow?: Role;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function TagsActionDialog({ currentRow, open, onOpenChange }: Props) {
+export function RolesActionDialog({ currentRow, open, onOpenChange }: Props) {
   const utils = trpc.useUtils();
   const isEdit = !!currentRow;
-  const form = useForm<CreateTagDTO>({
-    resolver: zodResolver(createTagSchema),
+  const form = useForm<CreateRoleInput>({
+    resolver: zodResolver(createRoleSchema),
     defaultValues: isEdit
-      ? {
+      ? ({
           ...currentRow,
           description: currentRow.description ?? undefined,
-        }
-      : {
+        } as unknown as CreateRoleInput)
+      : ({
           description: "",
-          tagName: "",
-        },
+          roleName: "",
+          id: nanoid(10),
+        } as CreateRoleInput),
   });
-  const { mutateAsync: createTagAsync, isPending: isCreatingTag } =
-    trpc.tags.createTag.useMutation();
-  const { mutateAsync: updateTagAsync, isPending: isUpdatingTag } =
-    trpc.tags.updateTag.useMutation();
+  const { mutateAsync: createRoleAsync, isPending: isCreatingRole } =
+    trpc.roles.createRole.useMutation();
+  const { mutateAsync: updateRoleAsync, isPending: isUpdatingRole } =
+    trpc.roles.updateRole.useMutation();
 
-  const onSubmit = async (values: CreateTagDTO) => {
+  const onSubmit = async (values: CreateRoleInput) => {
     form.reset();
     if (isEdit) {
-      await updateTagAsync({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        tagId: currentRow.tagId as any,
+      await updateRoleAsync({
         ...values,
+        id: currentRow.roleId,
       });
     } else {
-      await createTagAsync(values);
+      await createRoleAsync(values);
     }
-    utils.tags.getTags.invalidate();
+    utils.roles.getRoles.invalidate();
     toast({
-      title: isEdit ? "Thẻ đã được cập nhật" : "Thẻ đã được tạo",
+      title: isEdit ? "Vai trò đã được cập nhật" : "Vai trò đã được tạo",
     });
     onOpenChange(false);
   };
@@ -82,11 +83,13 @@ export function TagsActionDialog({ currentRow, open, onOpenChange }: Props) {
     >
       <DialogContent className="sm:max-w-lg">
         <DialogHeader className="text-left">
-          <DialogTitle>{isEdit ? "Cập nhật thẻ" : "Tạo thẻ mới"}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Cập nhật vai trò" : "Tạo vai trò mới"}
+          </DialogTitle>
 
           <DialogDescription>
             Nhấn vào nút &quot;Lưu thay đổi&quot; để{" "}
-            {isEdit ? "cập nhật" : "tạo mới"} thẻ.
+            {isEdit ? "cập nhật" : "tạo mới"} vai trò.
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="-mr-4 w-full py-1 pr-4">
@@ -98,14 +101,28 @@ export function TagsActionDialog({ currentRow, open, onOpenChange }: Props) {
             >
               <FormField
                 control={form.control}
-                name="tagName"
+                name="id"
+                defaultValue={nanoid(10)}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tên thẻ</FormLabel>
+                    <FormLabel>Id</FormLabel>
+                    <FormControl>
+                      <Input readOnly type="text" placeholder="Id" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="roleName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tên vai trò</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
-                        placeholder="Binary Search"
+                        placeholder="Người đóng góp"
                         {...field}
                       />
                     </FormControl>
@@ -122,7 +139,7 @@ export function TagsActionDialog({ currentRow, open, onOpenChange }: Props) {
                     <FormLabel>Mô tả</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Thuật toán tìm kiếm nhị phân"
+                        placeholder="Mô tả"
                         {...rest}
                         value={value ?? undefined}
                       />
@@ -138,9 +155,9 @@ export function TagsActionDialog({ currentRow, open, onOpenChange }: Props) {
           <Button
             type="submit"
             form="user-form"
-            disabled={isCreatingTag || isUpdatingTag}
+            disabled={isCreatingRole || isUpdatingRole}
           >
-            {(isUpdatingTag || isCreatingTag) && (
+            {(isUpdatingRole || isCreatingRole) && (
               <Loader2 className="animate-spin" />
             )}
             Lưu thay đổi

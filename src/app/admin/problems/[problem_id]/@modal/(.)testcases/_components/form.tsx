@@ -44,9 +44,11 @@ import {
   type NewTestCaseInput,
   newTestCaseSchema,
 } from "@/server/schema/testcase.schema";
-type FormType = Omit<z.infer<typeof newTestCaseSchema>, "explanation" | 'createdAt' | "updatedAt"> & {
+type FormType = Omit<
+  z.infer<typeof newTestCaseSchema>,
+  "explanation" | "createdAt" | "updatedAt"
+> & {
   explanation?: unknown;
-
 };
 
 const DEFAULT_FORM_VALUES: FormType = {
@@ -111,7 +113,6 @@ export default function TestcaseForm({ problem_id, type, testcase }: Props) {
       refresh();
     }, 1000);
   };
-  console.log(form.formState.errors);
   return (
     <Dialog
       open={true}

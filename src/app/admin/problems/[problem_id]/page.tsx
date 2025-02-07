@@ -16,22 +16,19 @@ export default async function EditProblem({
   }
   return (
     <CreateForm
-      initialValues={
-        {
-          ...problem,
-          tags: [],
-          selectedTags:
-            problem?.problemTags?.map((tag) => ({
-              value: tag.tag.tagId,
-              label: tag.tag.tagName,
-            })) || [],
-          newTags: [],
-          timeLimitInMs: Number(problem.timeLimitInMs.toNumber()),
-          memoryLimitInKb: Number(problem.memoryLimitInKb.toNumber()),
-          problemStatement: problem.problemStatement as object,
-
-        }
-      }
+      initialValues={{
+        ...problem,
+        tags: [],
+        selectedTags:
+          problem?.problemTags?.map((tag) => ({
+            value: tag.tag.tagId,
+            label: tag.tag.tagName,
+          })) || [],
+        newTags: [],
+        timeLimitInMs: Number(problem.timeLimitInMs),
+        memoryLimitInKb: Number(problem.memoryLimitInKb),
+        problemStatement: problem.problemStatement as object,
+      }}
       type="update"
     />
   );

@@ -73,7 +73,7 @@ async function initRoles(client: PrismaClient, withClean = false) {
     },
     {
       roleId: "everyone",
-      roleName: "Tất cả mọi người",
+      roleName: "Mặc định",
       description: "Đây là vai trò mặc định của tất cả người dùng khi hệ thống",
       rules: everyoneRole,
     },
@@ -109,10 +109,10 @@ async function initAdminUser(client: PrismaClient) {
 
 async function main() {
   const prisma = new PrismaClient();
-  //   await initResources(prisma, true);
-  //   await initActions(prisma, true);
-  //   await initRoles(prisma, true);
-  //   await initAdminUser(prisma);
+  // await initResources(prisma, true);
+  // await initActions(prisma, true);
+  // await initRoles(prisma, true);
+  // await initAdminUser(prisma);
   return prisma;
 }
 

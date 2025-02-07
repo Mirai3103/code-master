@@ -9,8 +9,8 @@ import {
   LuText as Text,
   LuTextQuote as TextQuote,
 } from "react-icons/lu";
-import { createSuggestionItems } from "novel/extensions";
-import { Command, renderItems } from "novel/extensions";
+import { createSuggestionItems } from "novel";
+import { Command, renderItems } from "novel";
 
 export const suggestionItems = createSuggestionItems([
   {

@@ -88,31 +88,19 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: "Pages",
+      title: "Hệ thống",
       items: [
         {
           title: "Auth",
           icon: IconLockAccess,
           items: [
             {
-              title: "Sign In",
-              url: "/sign-in",
+              title: "Người dùng",
+              url: "/admin/users",
             },
             {
-              title: "Sign In (2 Col)",
-              url: "/sign-in-2",
-            },
-            {
-              title: "Sign Up",
-              url: "/sign-up",
-            },
-            {
-              title: "Forgot Password",
-              url: "/forgot-password",
-            },
-            {
-              title: "OTP",
-              url: "/otp",
+              title: "Vai trò",
+              url: "/admin/roles",
             },
           ],
         },
@@ -150,10 +138,10 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: "Other",
+      title: "Khác",
       items: [
         {
-          title: "Settings",
+          title: "Cài đặt",
           icon: IconSettings,
           items: [
             {

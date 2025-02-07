@@ -112,6 +112,7 @@ export class TestcaseService {
       if (match) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [_, type, label] = match;
+        console.log(type, label);
         const content = entry.getData().toString("utf8");
 
         if (!testcaseMap.has(label || "")) {

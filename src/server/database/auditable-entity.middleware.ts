@@ -1,12 +1,6 @@
 import { Prisma } from "@prisma/client";
-import { auth } from "../auth";
-import { cache } from "react";
 
-// Cache getCurrentUser với react cache
-const getCurrentUser = cache(async () => {
-  const session = await auth();
-  return session?.user?.id ?? null;
-});
+import { getCurrentUser } from "@/util/getCurrentUser";
 
 // Tối ưu việc check model fields bằng Map
 const modelAuditFields = new Map<string, Set<string>>();

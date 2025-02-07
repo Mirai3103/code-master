@@ -27,20 +27,11 @@ export const newTestCaseSchema = z.object({
     .max(50, { message: "Nhãn không được dài quá 50 ký tự" })
     .nullish(),
   explanation: z.union([z.string(), z.object({})]).nullish(),
-  createdAt: z
-    .string()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), {
-      message: "Ngày tạo phải là một ngày hợp lệ",
-    }),
-  updatedAt: z
-    .string()
-    .optional()
-    .refine((val) => !val || !isNaN(Date.parse(val)), {
-      message: "Ngày cập nhật phải là một ngày hợp lệ",
-    }),
 });
 
 // Loại trích xuất từ schema
 export type NewTestCaseInput = z.infer<typeof newTestCaseSchema>;
-export type TestCase = NewTestCaseInput;
+export type TestCase = NewTestCaseInput & {
+  createdAt: Date;
+  updatedAt: Date;
+};

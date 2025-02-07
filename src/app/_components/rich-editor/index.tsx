@@ -12,7 +12,7 @@ import { LinkSelector } from "./link-selector";
 import { TextButtons } from "./text-buttons";
 import { ColorSelector } from "./color-selector";
 import { defaultExtensions } from "./extensions";
-import { Placeholder } from "novel/extensions";
+import { Placeholder } from "novel";
 interface NovelEditorProps {
   onChange: (content: JSONContent) => void;
   content: JSONContent;
