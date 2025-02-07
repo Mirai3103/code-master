@@ -21,6 +21,14 @@ import { CreateRoleInput, createRoleSchema, Rule } from "@/server/schema/role";
 import { Main } from "@/app/_components/layout/main";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
+import { trpc } from "@/trpc/react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/app/_components/ui/tooltip";
+import { FancyMultiSelect } from "@/app/_components/ui/fancy-multi-select";
 // Giả lập dữ liệu từ BE
 const mockSubjects = ["users", "products", "orders", "categories", "customers"];
 const mockFields = {
@@ -36,6 +44,9 @@ const ACTIONS = ["create", "read", "update", "delete", "manage"];
 // Zod Schemas
 
 const RoleManagement = () => {
+  const [{ data: actions }, { data: resources }] = trpc.useQueries((t) => {
+    return [t.permissions.getActions(), t.permissions.getResources()];
+  });
   const form = useForm<CreateRoleInput>({
     resolver: zodResolver(createRoleSchema),
     defaultValues: {
@@ -134,7 +145,7 @@ const RoleManagement = () => {
 
             {/* Thêm Rule mới */}
             <div className="space-y-4 rounded-lg border p-4">
-              <h3 className="font-semibold">Thêm Rule Mới</h3>
+              <h3 className="font-semibold">Thêm quyền Mới</h3>
               {/* Chọn Actions */}
               <div className="space-y-2">
                 <Label>Hành động (Actions)</Label>
@@ -144,22 +155,45 @@ const RoleManagement = () => {
                     name="action"
                     render={({ field }) => (
                       <div>
-                        {ACTIONS.map((action) => (
-                          <Button
-                            type="button"
-                            key={action}
-                            variant={
-                              field.value.includes(action as any)
-                                ? "default"
-                                : "outline"
-                            }
-                            onClick={() => {
-                              field.onChange([...field.value, action]);
-                            }}
-                            className="mx-1 capitalize"
-                          >
-                            {action}
-                          </Button>
+                        {actions?.map((action) => (
+                          <TooltipProvider key={action.actionId}>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  type="button"
+                                  variant={
+                                    field.value.includes(action.actionId as any)
+                                      ? "default"
+                                      : "outline"
+                                  }
+                                  onClick={() => {
+                                    if (
+                                      field.value.includes(
+                                        action.actionId as any,
+                                      )
+                                    ) {
+                                      field.onChange(
+                                        field.value.filter(
+                                          (a) => a !== action.actionId,
+                                        ),
+                                      );
+                                    } else {
+                                      field.onChange([
+                                        ...field.value,
+                                        action.actionId,
+                                      ]);
+                                    }
+                                  }}
+                                  className="mx-1 capitalize"
+                                >
+                                  {action.actionName}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{action.description || action.actionName}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         ))}
                       </div>
                     )}
@@ -174,20 +208,45 @@ const RoleManagement = () => {
                   control={currentRuleForm.control}
                   name="subject"
                   render={({ field }) => (
-                    <select
-                      className="w-full rounded border p-2"
-                      value={field.value}
-                      onChange={(e) => {
-                        field.onChange([e.target.value]);
+                    <FancyMultiSelect
+                      options={
+                        resources?.map((resource) => ({
+                          label: resource.resourceName,
+                          value: resource.resourceId,
+                        })) || []
+                      }
+                      placeholder="Chọn đối tượng"
+                      onChange={(setAction) => {
+                        if (typeof setAction === "function") {
+                          const currentSelected = field.value
+                            .map(
+                              (value) =>
+                                resources?.find(
+                                  (resource) => resource.resourceId === value,
+                                )!,
+                            )
+                            .map((resource) => ({
+                              label: resource.resourceName,
+                              value: resource.resourceId,
+                            }));
+                          const newTags = setAction(currentSelected);
+                          field.onChange(newTags.map((tag) => tag.value));
+                          return;
+                        }
+                        field.onChange(setAction.map((tag) => tag.value));
                       }}
-                    >
-                      <option value="">Chọn đối tượng...</option>
-                      {mockSubjects.map((subject) => (
-                        <option key={subject} value={subject}>
-                          {subject}
-                        </option>
-                      ))}
-                    </select>
+                      selectedOptions={field.value
+                        .map(
+                          (value) =>
+                            resources?.find(
+                              (resource) => resource.resourceId === value,
+                            )!,
+                        )
+                        .map((resource) => ({
+                          label: resource.resourceName,
+                          value: resource.resourceId,
+                        }))}
+                    />
                   )}
                 />
               </div>
@@ -252,16 +311,29 @@ const RoleManagement = () => {
                     >
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">{rule.subject}</span>
                           {rule.action.map((action) => (
                             <Badge key={action} variant="secondary">
-                              {action}
+                              {
+                                actions?.find((a) => a.actionId === action)
+                                  ?.actionName
+                              }
                             </Badge>
                           ))}
+                          <span className="font-medium">
+                            {rule.subject
+                              .map(
+                                (subject) =>
+                                  resources?.find(
+                                    (resource) =>
+                                      resource.resourceId === subject,
+                                  )?.resourceName,
+                              )
+                              .join(", ")}
+                          </span>
                         </div>
-                        {rule.fields && (
+                        {rule.fields?.length && (
                           <div className="text-sm text-gray-600">
-                            Fields: {rule.fields.join(", ")}
+                            Fields: {rule.fields!.join(", ")}
                           </div>
                         )}
                       </div>

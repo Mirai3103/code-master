@@ -6,6 +6,7 @@ import { testcaseRouter } from "./routers/testcase";
 import { submissionRouter } from "./routers/submission";
 import { userRouter } from "./routers/user";
 import { roleRouter } from "./routers/role";
+import { permissionRouter } from "./routers/permission";
 
 /**
  * This is the primary router for your server.
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
   submissions: submissionRouter,
   users: userRouter,
   roles: roleRouter,
+  permissions: permissionRouter,
 });
 
 // export type definition of API

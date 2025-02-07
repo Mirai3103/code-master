@@ -10,11 +10,12 @@ import { DataTable } from "@/components/data-table/data-table";
 import { type Role } from "@/server/schema/role";
 import { Button } from "@/app/_components/ui/button";
 import { RolesActionDialog } from "./_components/CU-dialog";
-import { RolesEditPermissionDialog } from "./_components/action-dialog";
+import { useRouter } from "next/navigation";
 export default function Roles() {
   const [selectedRow, setSelectedRow] = useState<Role | null | undefined>(null);
   const [open, setOpen] = useState<DialogType | null>(null);
   const table = useRoleTable();
+  const { push } = useRouter();
   return (
     <RoleProvider value={{ selectedRow, setSelectedRow, open, setOpen }}>
       <div>
@@ -33,7 +34,10 @@ export default function Roles() {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button className="space-x-1" onClick={() => setOpen("add")}>
+              <Button
+                className="space-x-1"
+                onClick={() => push("/admin/roles/new")}
+              >
                 <span>Tạo mới</span> <IconTextPlus size={18} />
               </Button>
             </div>
@@ -43,13 +47,7 @@ export default function Roles() {
           </div>
         </Main>
       </div>
-      {open == "permission" && (
-        <RolesEditPermissionDialog
-          open={open == "permission"}
-          onOpenChange={() => setOpen(null)}
-          currentRow={selectedRow!}
-        />
-      )}
+
       {open == "add" && (
         <RolesActionDialog
           open={open == "add"}
