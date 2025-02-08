@@ -60,11 +60,11 @@ export function DataTableRowActions({
           <DropdownMenuItem
             onClick={() => {
               setSelectedRow(row.original);
-              setOpen("permission");
+              setOpen("delete");
             }}
             className="!text-red-500"
           >
-            Phân quyền
+            Xóa
             <DropdownMenuShortcut>
               <IconTrash size={16} />
             </DropdownMenuShortcut>

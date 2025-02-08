@@ -6,10 +6,10 @@ export enum SystemRole {
 }
 const actions = z.enum(["create", "read", "update", "delete", "manage"]);
 export const ruleSchema = z.object({
-  action: z.array(actions),
-  subject: z.array(z.string()),
+  action: z.array(actions).min(1, "Vui lòng chọn ít nhất 1 quyền"),
+  subject: z.array(z.string()).min(1, "Vui lòng chọn ít nhất 1 đối tượng"),
   condition: z.any().nullish(),
-  inverted: z.boolean().nullish(),
+  inverted: z.boolean().nullish().default(false),
   fields: z.array(z.string()).nullish(),
   reason: z.string().nullish(),
 });

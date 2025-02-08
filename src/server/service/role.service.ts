@@ -46,7 +46,7 @@ export class RoleService extends AbstractService {
       data: {
         roleName: input.roleName,
         description: input.description,
-        rules: input.rules,
+        ...(input.rules !== undefined ? { rules: input.rules } : {}),
       },
     });
   }

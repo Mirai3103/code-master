@@ -1,4 +1,5 @@
 "use client";
+import { Role } from "@/server/schema/role";
 import { LuTrash2, LuSave } from "react-icons/lu";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,26 +23,24 @@ import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { trpc } from "@/trpc/react";
 import RuleActionForm from "../../_components/RuleActionForm";
-import { nanoid } from "nanoid";
 import { toast } from "@/app/_hooks/use-toast";
 import { useRouter } from "next/navigation";
 
-// Zod Schemas
-
-const RoleManagement = () => {
+interface IProp {
+  role: Role;
+}
+export default function EditForm({ role }: IProp) {
   const [{ data: actions }, { data: resources }] = trpc.useQueries((t) => {
     return [t.permissions.getActions(), t.permissions.getResources()];
   });
-  const form = useForm<CreateRoleInput>({
+  const form = useForm<CreateRoleInput & { isTouchedRules: boolean }>({
     resolver: zodResolver(createRoleSchema),
     defaultValues: {
-      roleName: "",
-      description: "",
-      rules: [],
-      id: nanoid(10),
+      ...(role as any),
+      isTouchedRules: false,
     },
   });
-  const { mutateAsync } = trpc.roles.createRole.useMutation();
+  const { mutateAsync } = trpc.roles.updateRole.useMutation();
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -49,6 +48,7 @@ const RoleManagement = () => {
   });
 
   const handleAddRule = (rule: Rule) => {
+    form.setValue("isTouchedRules", true);
     append(rule);
   };
 
@@ -83,11 +83,8 @@ const RoleManagement = () => {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">
-              Thêm vai trò mới
+              Sửa vai trò: <b>{role.roleName}</b>
             </h2>
-            <p className="text-muted-foreground">
-              Thêm vai trò mới và quản lý quyền truy cập của vai trò
-            </p>
           </div>
           <Button asChild variant="outline" className="space-x-2">
             <Link href="/admin/roles">
@@ -185,7 +182,10 @@ const RoleManagement = () => {
                         type="button"
                         variant="destructive"
                         size="icon"
-                        onClick={() => remove(index)}
+                        onClick={() => {
+                          remove(index);
+                          form.setValue("isTouchedRules", true);
+                        }}
                       >
                         <LuTrash2 className="h-4 w-4" />
                       </Button>
@@ -214,6 +214,4 @@ const RoleManagement = () => {
       </Main>
     </div>
   );
-};
-
-export default RoleManagement;
+}
