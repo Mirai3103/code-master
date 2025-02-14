@@ -34,4 +34,14 @@ export const roleRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return ctx.services.role.deleteRole(input.roleId);
     }),
+
+  getRolesByIds: publicProcedure
+    .input(
+      z.object({
+        roleIds: z.array(z.string()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.services.role.getRolesByIds(input.roleIds);
+    }),
 });

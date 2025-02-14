@@ -1,5 +1,5 @@
 "use client";
-import { LuCirclePlus } from "react-icons/lu";
+import { LuCirclePlus, LuImport } from "react-icons/lu";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,9 @@ import {
   TooltipTrigger,
 } from "@/app/_components/ui/tooltip";
 import { FancyMultiSelect } from "@/app/_components/ui/fancy-multi-select";
+import { useState } from "react";
+import { DialogTitle, Dialog, DialogContent, DialogHeader } from "@/app/_components/ui/dialog";
+import ChooseRoles from "./ChooseRoles";
 
 interface IProps {
   mode: "edit" | "create";
@@ -40,13 +43,13 @@ export default function RuleActionForm({
       mode == "edit"
         ? rule
         : {
-            action: [],
-            subject: [],
-            fields: undefined,
-            inverted: false,
-            condition: undefined,
-            reason: undefined,
-          },
+          action: [],
+          subject: [],
+          fields: undefined,
+          inverted: false,
+          condition: undefined,
+          reason: undefined,
+        },
   });
 
   const handleSubmit = (data: Rule) => {
@@ -209,6 +212,52 @@ export default function RuleActionForm({
         <LuCirclePlus className="mr-2 h-4 w-4" />
         Thêm Rule
       </Button>
+      <ImportRulesFromRolesModal onImport={(rules) => {
+        rules.forEach(rule => {
+          const newRule: Rule = {
+            ...rule,
+          } as Rule;
+          if (rule.action.constructor !== Array) {
+            newRule.action = [rule.action as any];
+          }
+          if (rule.subject.constructor !== Array) {
+            newRule.subject = [rule.subject as any];
+          }
+          handleSubmit(newRule);
+        })
+      }} />
     </Form>
   );
+}
+
+interface IImportRulesFromRolesModalProps {
+  onImport: (rules: Rule[]) => void;
+}
+function ImportRulesFromRolesModal({ onImport }: IImportRulesFromRolesModalProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const { mutateAsync } = trpc.roles.getRolesByIds.useMutation({});
+
+  const handleImport = async (ids: string[]) => {
+    const roles = await mutateAsync({ roleIds: ids });
+    onImport(roles.flatMap(role => role.rules as unknown as Rule[]));
+    setIsOpen(false);
+  }
+  return (
+    <>
+      <Button className="mt-4 ml-2" type="button" onClick={() => setIsOpen(true)} >
+        <LuImport className="mr-2 h-4 w-4" />
+        Nhập từ vai trò khác</Button>
+      <Dialog
+        open={isOpen}
+        onOpenChange={setIsOpen}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold">Đăng nhập</DialogTitle>
+          </DialogHeader>
+          <ChooseRoles onSubmit={handleImport} onCancel={() => setIsOpen(false)} />
+        </DialogContent>
+      </Dialog>
+    </>
+  )
 }

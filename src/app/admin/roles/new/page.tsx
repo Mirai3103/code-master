@@ -167,10 +167,13 @@ const RoleManagement = () => {
                             {rule.subject
                               .map(
                                 (subject) =>
-                                  resources?.find(
+                                 {
+                                  if(subject === "all"||subject === "*") return "Tất cả"
+                                 return resources?.find(
                                     (resource) =>
                                       resource.resourceId === subject,
-                                  )?.resourceName,
+                                  )?.resourceName
+                                 }
                               )
                               .join(", ")}
                           </span>

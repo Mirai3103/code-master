@@ -61,4 +61,14 @@ export class RoleService extends AbstractService {
       },
     });
   }
+
+  public async getRolesByIds(roleIds: string[]) {
+    return this.prisma.role.findMany({
+      where: {
+        roleId: {
+          in: roleIds,
+        },
+      },
+    });
+  }
 }
