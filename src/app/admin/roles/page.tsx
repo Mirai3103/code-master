@@ -11,6 +11,7 @@ import { type Role } from "@/server/schema/role";
 import { Button } from "@/app/_components/ui/button";
 import { RolesActionDialog } from "./_components/CU-dialog";
 import { useRouter } from "next/navigation";
+import { RolesDeleteDialog } from "./_components/delete-dialog";
 export default function Roles() {
   const [selectedRow, setSelectedRow] = useState<Role | null | undefined>(null);
   const [open, setOpen] = useState<DialogType | null>(null);
@@ -48,10 +49,11 @@ export default function Roles() {
         </Main>
       </div>
 
-      {open == "add" && (
-        <RolesActionDialog
-          open={open == "add"}
+      {open == "delete" && (
+        <RolesDeleteDialog
+          open={open == "delete"}
           onOpenChange={() => setOpen(null)}
+          currentRow={selectedRow as any}
         />
       )}
     </RoleProvider>

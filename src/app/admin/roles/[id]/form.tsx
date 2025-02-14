@@ -38,6 +38,7 @@ export default function EditForm({ role }: IProp) {
     defaultValues: {
       ...(role as any),
       isTouchedRules: false,
+      id: role.roleId,
     },
   });
   const { mutateAsync } = trpc.roles.updateRole.useMutation();
@@ -53,14 +54,18 @@ export default function EditForm({ role }: IProp) {
   };
 
   const router = useRouter();
-  const onSubmit = (data: CreateRoleInput) => {
+  const onSubmit = (data: CreateRoleInput & { isTouchedRules: boolean }) => {
+    const payload = { ...data };
+    if (!data.isTouchedRules) {
+      delete payload.rules;
+    }
     console.log("Form data:", data);
     mutateAsync(data)
       .then((data) => {
         toast({
           duration: 3000,
           title: "Thành công",
-          description: "Vai trò đã được tạo thành công",
+          description: "Vai trò đã được cập nhật thành công",
         });
         router.push("/admin/roles");
       })
@@ -72,6 +77,7 @@ export default function EditForm({ role }: IProp) {
         });
       });
   };
+  console.log(form.formState.errors, role);
   return (
     <div>
       <Header sticky>
