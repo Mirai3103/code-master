@@ -135,4 +135,44 @@ export class UserService extends AbstractService {
       });
     }
   }
+
+  async getUserRoleIds(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        Role: {
+          select: {
+            roleId: true,
+          },
+        },
+      },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user.Role.map((role) => role.roleId);
+  }
+  async addRolesToUser(userId: string, roleIds: string[]) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        Role: {
+          connect: roleIds.map((roleId) => ({ roleId })),
+        },
+      },
+    });
+  }
 }

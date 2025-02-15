@@ -71,6 +71,7 @@ export default function CreateTestcaseFromZipModal({
         type: "manual",
         message: "An error occurred during upload.",
       });
+      alert("An error occurred during upload.");
     }
   };
 

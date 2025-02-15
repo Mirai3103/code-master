@@ -48,15 +48,31 @@ export function UsersEditPermissionDialog({
     },
   });
   const { data: roles } = trpc.roles.getRoles.useQuery();
+  const { mutateAsync } = trpc.users.saveUserPerms.useMutation();
+  React.useEffect(() => {
+    if (currentRow) {
+      form.reset({
+        roles: currentRow.Role.map((r) => r.roleId),
+        userId: currentRow.id,
+      });
+    }
+  }, [currentRow]);
 
   const onSubmit = async (values: EditUserRolesInput) => {
-    utils.users.getUsers.invalidate();
-    toast({
-      title: "Người dùng đã được cập nhật",
-    });
-    form.reset();
-
-    onOpenChange(false);
+    try {
+      await mutateAsync(values);
+      utils.users.getUsers.invalidate();
+      toast({
+        title: "Người dùng đã được cập nhật",
+      });
+      form.reset();
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: "Có lỗi xảy ra",
+        description: (error as any)?.message || "Vui lòng thử lại sau",
+      });
+    }
   };
   return (
     <Dialog

@@ -42,7 +42,7 @@ const RoleManagement = () => {
     },
   });
   const { mutateAsync } = trpc.roles.createRole.useMutation();
-
+  const utils = trpc.useUtils();
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "rules",
@@ -70,6 +70,9 @@ const RoleManagement = () => {
           title: "Thất bại",
           description: "Đã có lỗi xảy ra",
         });
+      })
+      .finally(() => {
+        utils.roles.getRoles.invalidate();
       });
   };
   return (
@@ -165,16 +168,13 @@ const RoleManagement = () => {
                           ))}
                           <span className="font-medium">
                             {rule.subject
-                              .map(
-                                (subject) =>
-                                 {
-                                  if(subject === "all"||subject === "*") return "Tất cả"
-                                 return resources?.find(
-                                    (resource) =>
-                                      resource.resourceId === subject,
-                                  )?.resourceName
-                                 }
-                              )
+                              .map((subject) => {
+                                if (subject === "all" || subject === "*")
+                                  return "Tất cả";
+                                return resources?.find(
+                                  (resource) => resource.resourceId === subject,
+                                )?.resourceName;
+                              })
                               .join(", ")}
                           </span>
                         </div>

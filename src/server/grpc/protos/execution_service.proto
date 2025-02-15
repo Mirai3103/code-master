@@ -1,43 +1,48 @@
-  syntax = "proto3";
+syntax = "proto3";
 
-  option go_package = "github.com/Mirai3103/remote-compiler/proto";
+option go_package = "github.com/Mirai3103/remote-compiler/proto";
 
-  // Message for Language struct
+// Message for Language struct
 
-  service ExecutionService {
-      rpc Execute(Submission) returns (stream SubmissionResult) {}
-  }
+service ExecutionService {
+    rpc Execute(Submission) returns (stream SubmissionResult) {}
+}
+message SubmissionSettings {
+  bool with_trim = 1;
+  bool with_case_sensitive = 2;
+  bool with_whitespace = 3;
+}
 
-  message Language {
-    string source_file_ext= 3;
-    string binary_file_ext = 4;
-    string compile_command = 5;
-    string run_command = 6;
-  }
+message Language {
+  string source_file_ext= 3;
+  string binary_file_ext = 4;
+  string compile_command = 5;
+  string run_command = 6;
+}
 
-  message SubmissionResult {
-    string submission_id = 1;
-    string test_case_id = 2;
-    string status = 3;
-    string stdout = 4;
-    float memory_usage = 5;
-    float time_usage = 6;
-  }
+message SubmissionResult {
+  string submission_id = 1;
+  string test_case_id = 2;
+  string status = 3;
+  string stdout = 4;
+  float memory_usage = 5;
+  float time_usage = 6;
+}
 
-  message TestCase {
-    string id = 1;
-    string input = 2;
-    string expect_output = 3;
-    string input_file = 4;
-    string output_file = 5;
-  }
+message TestCase {
+  string id = 1;
+  string input = 2;
+  string expect_output = 3;
+  string input_file = 4;
+  string output_file = 5;
+}
 
-  message Submission {
-    string id = 1;
-    Language language = 2;
-    string code = 3;
-    int32 time_limit = 4;
-    int32 memory_limit = 5;
-    repeated TestCase test_cases = 6;
-  }
-
+message Submission {
+  string id = 1;
+  Language language = 2;
+  string code = 3;
+  int32 time_limit = 4;
+  int32 memory_limit = 5;
+  repeated TestCase test_cases = 6;
+  SubmissionSettings settings = 7;
+}
