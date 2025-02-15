@@ -1,6 +1,7 @@
 // package:
 // file: execution_service.proto
 
+/* tslint:disable */
 /* eslint-disable */
 
 import * as grpc from "grpc";

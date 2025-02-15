@@ -1,9 +1,47 @@
 // package:
 // file: execution_service.proto
 
+/* tslint:disable */
 /* eslint-disable */
 
 import * as jspb from "google-protobuf";
+
+export class SubmissionSettings extends jspb.Message {
+  getWithTrim(): boolean;
+  setWithTrim(value: boolean): SubmissionSettings;
+  getWithCaseSensitive(): boolean;
+  setWithCaseSensitive(value: boolean): SubmissionSettings;
+  getWithWhitespace(): boolean;
+  setWithWhitespace(value: boolean): SubmissionSettings;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SubmissionSettings.AsObject;
+  static toObject(
+    includeInstance: boolean,
+    msg: SubmissionSettings,
+  ): SubmissionSettings.AsObject;
+  static extensions: { [key: number]: jspb.ExtensionFieldInfo<jspb.Message> };
+  static extensionsBinary: {
+    [key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>;
+  };
+  static serializeBinaryToWriter(
+    message: SubmissionSettings,
+    writer: jspb.BinaryWriter,
+  ): void;
+  static deserializeBinary(bytes: Uint8Array): SubmissionSettings;
+  static deserializeBinaryFromReader(
+    message: SubmissionSettings,
+    reader: jspb.BinaryReader,
+  ): SubmissionSettings;
+}
+
+export namespace SubmissionSettings {
+  export type AsObject = {
+    withTrim: boolean;
+    withCaseSensitive: boolean;
+    withWhitespace: boolean;
+  };
+}
 
 export class Language extends jspb.Message {
   getSourceFileExt(): string;
@@ -147,6 +185,11 @@ export class Submission extends jspb.Message {
   setTestCasesList(value: Array<TestCase>): Submission;
   addTestCases(value?: TestCase, index?: number): TestCase;
 
+  hasSettings(): boolean;
+  clearSettings(): void;
+  getSettings(): SubmissionSettings | undefined;
+  setSettings(value?: SubmissionSettings): Submission;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Submission.AsObject;
   static toObject(
@@ -173,8 +216,9 @@ export namespace Submission {
     id: string;
     language?: Language.AsObject;
     code: string;
-    timeLimitInMs: number;
-    memoryLimitInKb: number;
+    timeLimit: number;
+    memoryLimit: number;
     testCasesList: Array<TestCase.AsObject>;
+    settings?: SubmissionSettings.AsObject;
   };
 }

@@ -19,7 +19,7 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "generate": "protoc --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts --ts_out=src/server/grpc/generated --proto_path=src/server/grpc/protos src/server/grpc/protos/execution_service.proto &&  protoc -I=src/server/grpc/protos --ts_out=src/server/grpc/generated src/server/grpc/protos/execution_service.proto"
+    "generate": "protoc --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts.exe --ts_out=src/server/grpc/generated --proto_path=src/server/grpc/protos src/server/grpc/protos/execution_service.proto &&  protoc -I=src/server/grpc/protos --ts_out=src/server/grpc/generated src/server/grpc/protos/execution_service.proto"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",

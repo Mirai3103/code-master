@@ -4,6 +4,7 @@ import {
   Language,
   Submission,
   TestCase,
+  SubmissionSettings,
 } from "../grpc/generated/execution_service";
 import { v4 as uuid } from "uuid";
 import { type PrismaClient } from "@prisma/client";
@@ -96,6 +97,11 @@ export class SubmissionService extends AbstractService {
             id: testCase.testCaseId,
           }),
       ),
+      settings: new SubmissionSettings({
+        with_case_sensitive: false,
+        with_trim: true,
+        with_whitespace: true,
+      }),
     });
 
     // Gọi gRPC client để thực thi submission
