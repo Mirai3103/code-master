@@ -1,3 +1,4 @@
+import { cn } from "@/app/_lib/utils";
 import {
   Accordion,
   AccordionContent,
@@ -20,10 +21,25 @@ export default function TestcaseRunner({
   actualOutput,
 }: Props) {
   const statusConfig = getStatusConfig(status);
+  const isTestcaseHidden = !testcase.isSample;
+  console.log("isTestcaseHidden", isTestcaseHidden);
   return (
-    <Accordion type="single" collapsible className="w-full">
+    <Accordion
+      type="single"
+      collapsible
+      className="w-full"
+      disabled={isTestcaseHidden}
+    >
       <AccordionItem value={testcase.testCaseId} className="mb-2 border-0">
-        <AccordionTrigger className="flex rounded-lg bg-white p-4 shadow-sm hover:no-underline data-[state=open]:rounded-b-none">
+        <AccordionTrigger
+          disabled={isTestcaseHidden}
+          className={cn(
+            "flex rounded-lg p-4 shadow-sm hover:no-underline data-[state=open]:rounded-b-none",
+            isTestcaseHidden
+              ? "cursor-not-allowed bg-gray-50"
+              : "cursor-pointer bg-white",
+          )}
+        >
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-3">
               {statusConfig.icon}

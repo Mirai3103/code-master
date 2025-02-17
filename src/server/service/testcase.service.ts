@@ -42,6 +42,30 @@ export class TestcaseService {
       },
     });
   }
+  async findAllTestcases(problemId: string) {
+    const testCases = await this.prisma.testcase.findMany({
+      where: {
+        problemId: problemId,
+      },
+      select: {
+        inputData: true,
+        isSample: true,
+        expectedOutput: true,
+        testCaseId: true,
+        points: true,
+        label: true,
+      },
+      orderBy: [{ label: "asc" }, { isSample: "desc" }, { testCaseId: "asc" }],
+    });
+
+    const processedTestCases = testCases.map((testCase) => ({
+      ...testCase,
+      inputData: testCase.isSample ? null : testCase.inputData,
+      expectedOutput: testCase.isSample ? null : testCase.expectedOutput,
+    }));
+
+    return processedTestCases;
+  }
 
   async findByTestcaseId(testCaseId: string) {
     return this.prisma.testcase.findUnique({

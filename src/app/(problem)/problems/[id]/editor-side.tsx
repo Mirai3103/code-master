@@ -16,7 +16,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import Editor from "@monaco-editor/react";
-import { LuCirclePlay as PlayCircle, LuTimer as Timer } from "react-icons/lu";
+import { LuPlay, LuSave, LuSend, LuTimer as Timer } from "react-icons/lu";
 import React, { useState } from "react";
 import { type LanguageOfProblem } from "@/server/service/problem.service";
 import { loader } from "@monaco-editor/react";
@@ -25,7 +25,9 @@ import TestcaseRunner from "./testcase";
 import { trpc } from "@/trpc/react";
 import { type TestCase } from "@/server/schema/testcase.schema";
 import { SubmissionTestcaseStatus } from "@/server/schema/enum";
-
+import { useSession } from "next-auth/react";
+import { toast } from "@/app/_hooks/use-toast";
+import { useProblemEditorContext } from "./context";
 interface Props {
   languages: LanguageOfProblem[];
   problemId: string;
@@ -36,6 +38,8 @@ type BriefTestcase = Omit<TestCase, "createdAt" | "updatedAt"> & {
 };
 
 export default function EditorSide({ languages, problemId }: Props) {
+  const { data: session, status } = useSession();
+
   const [language, setLanguage] = useState(
     languages?.[0]?.monacoCodeLanguage || "plaintext",
   );
@@ -59,6 +63,51 @@ export default function EditorSide({ languages, problemId }: Props) {
     });
   }, [language, editorRef, languages]);
   const { mutateAsync } = trpc.submissions.runCode.iterable.useMutation();
+  const { mutateAsync: saveDraft, isPending: isSaveDraftPending } =
+    trpc.submissions.saveDraft.useMutation();
+
+  const { data: latestDraft } = trpc.submissions.getLatestDraft.useQuery(
+    {
+      problemId,
+      languageId: languages.find(
+        (lang) => lang.monacoCodeLanguage === language,
+      )!.languageId!,
+    },
+    {
+      enabled:
+        !!session?.user.id && !!languages.length && !!problemId && !!language,
+    },
+  );
+  React.useEffect(() => {
+    console.log("latestDraft", latestDraft);
+    if (latestDraft && editorRef.current && latestDraft.code) {
+      editorRef.current.setValue(latestDraft.code);
+    }
+  }, [latestDraft, editorRef]);
+
+  const handleSaveDraft = React.useCallback(() => {
+    saveDraft({
+      code: editorRef.current.getValue(),
+      problemId,
+      userId: "1",
+      languageId: languages.find(
+        (lang) => lang.monacoCodeLanguage === language,
+      )!.languageId!,
+      isTest: false,
+    })
+      .then((submissionId) => {
+        console.log("Save draft success", submissionId);
+        toast({
+          title: "Lưu nháp thành công",
+        });
+      })
+      .catch((error) => {
+        toast({
+          title: "Lưu nháp thất bại",
+          description: error.message,
+        });
+      });
+  }, [editorRef, language, languages, problemId, saveDraft]);
 
   const { data } = trpc.testcases.getPublicTestcases.useQuery({
     problemId,
@@ -108,6 +157,7 @@ export default function EditorSide({ languages, problemId }: Props) {
       }
     });
   }, [editorRef, language, languages, mutateAsync, problemId]);
+
   return (
     <div className="flex w-1/2 flex-col p-1">
       {/* Editor controls */}
@@ -140,6 +190,7 @@ export default function EditorSide({ languages, problemId }: Props) {
                 className="mt-1 w-full"
                 onClick={handleSubmission}
               >
+                <LuPlay className="h-4 w-4" />
                 Chạy test
               </Button>
             </DrawerTrigger>
@@ -158,10 +209,11 @@ export default function EditorSide({ languages, problemId }: Props) {
                         key={index}
                         actualOutput={test.actualOutput}
                         status={test.status}
-                        testcase={test}
+                        testcase={test as never}
                       />
                     ))}
                   </div>
+                  {/* todo: show result */}
                   {/* <div className="mt-4 p-4 bg-gray-100 rounded-md font-mono text-sm">
 										<div className="text-green-600">
 											[Success] All test cases passed!
@@ -177,14 +229,23 @@ export default function EditorSide({ languages, problemId }: Props) {
               </div>
             </DrawerContent>
           </Drawer>
-          <Drawer>
-            <DrawerTrigger asChild>
-              <Button className="gap-2 bg-blue-600 hover:bg-blue-700">
-                <PlayCircle className="h-4 w-4" />
-                Nộp bài
-              </Button>
-            </DrawerTrigger>
-          </Drawer>
+          <Button
+            variant="outline"
+            className="mt-1 w-full"
+            disabled={isSaveDraftPending}
+            onClick={handleSaveDraft}
+          >
+            <LuSave className="h-4 w-4" />
+            Lưu nháp
+          </Button>
+          <SubmittingButton
+            problemId={problemId}
+            getCode={() => editorRef.current.getValue()}
+            getLanguageId={() =>
+              languages.find((lang) => lang.monacoCodeLanguage === language)
+                ?.languageId || 0
+            }
+          />
         </div>
       </div>
 
@@ -208,5 +269,66 @@ export default function EditorSide({ languages, problemId }: Props) {
         />
       </div>
     </div>
+  );
+}
+
+interface ISubmittingButtonProps {
+  getCode: () => string;
+  getLanguageId: () => number;
+  problemId: string;
+}
+
+function SubmittingButton({
+  problemId,
+  getCode,
+  getLanguageId,
+}: ISubmittingButtonProps) {
+  const { setIsShowSubmitTab, setSubmissionStatus, setTabValue, setTestcases } =
+    useProblemEditorContext();
+  const { mutateAsync, isPending } =
+    trpc.submissions.runCode.iterable.useMutation();
+  const handleSubmission = () => {
+    setTestcases((testcases) =>
+      testcases.map((testcase) => ({
+        ...testcase,
+        status: SubmissionTestcaseStatus.RUNNING,
+      })),
+    );
+    setIsShowSubmitTab(true);
+    setTabValue("submit");
+    mutateAsync({
+      code: getCode(),
+      problemId: problemId,
+      userId: "1",
+      languageId: getLanguageId(),
+      isTest: false,
+    }).then(async (asynGen) => {
+      for await (const i of asynGen) {
+        console.log("runCode", i);
+        setTestcases((testcases) =>
+          testcases.map((testcase) => {
+            if (testcase.testCaseId == i.testCaseId) {
+              return {
+                ...testcase,
+                status: i.status as SubmissionTestcaseStatus,
+                actualOutput: i.stdout,
+              };
+            }
+            return testcase;
+          }),
+        );
+      }
+    });
+  };
+
+  return (
+    <Button
+      className="gap-2 bg-blue-600 hover:bg-blue-700"
+      disabled={isPending}
+      onClick={handleSubmission}
+    >
+      <LuSend className="h-4 w-4" />
+      {isPending ? "Đang nộp..." : "Nộp bài"}
+    </Button>
   );
 }

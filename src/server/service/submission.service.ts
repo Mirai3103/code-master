@@ -9,6 +9,7 @@ import {
 import { v4 as uuid } from "uuid";
 import { type PrismaClient } from "@prisma/client";
 import { type RunCodeInput } from "../schema/submission.dto";
+import { SubmissionStatus } from "../schema/enum";
 
 export class SubmissionService extends AbstractService {
   private readonly executionServiceClient: ExecutionServiceClient;
@@ -22,7 +23,7 @@ export class SubmissionService extends AbstractService {
   }
 
   public async testRunCode(input: RunCodeInput) {
-    const { code, languageId, problemId } = input;
+    const { code, languageId, problemId, isTest } = input;
 
     // Tìm thông tin problem
     const problem = await this.prisma.problem.findUnique({
@@ -64,7 +65,7 @@ export class SubmissionService extends AbstractService {
     const problemTestCases = await this.prisma.testcase.findMany({
       where: {
         problemId: problemId,
-        isSample: true,
+        ...(isTest ? { isSample: true } : {}),
       },
       select: {
         testCaseId: true,
@@ -108,5 +109,57 @@ export class SubmissionService extends AbstractService {
     const result = this.executionServiceClient.Execute(submission);
 
     return result;
+  }
+  async saveDraft(input: Omit<RunCodeInput, "isTest">) {
+    const currentUserId = await this.getCurrentUserId();
+    if (!currentUserId) {
+      throw new Error("Not authenticated.");
+    }
+    const { code, languageId, problemId } = input;
+    const draft = await this.prisma.submission.findFirst({
+      where: {
+        userId: currentUserId,
+        problemId,
+        languageId,
+        status: SubmissionStatus.DRAFT,
+      },
+    });
+    if (draft) {
+      await this.prisma.submission.update({
+        where: { submissionId: draft.submissionId },
+        data: { code },
+      });
+      return draft.submissionId;
+    }
+
+    const newDraft = await this.prisma.submission.create({
+      data: {
+        code,
+        languageId,
+        problemId,
+        status: SubmissionStatus.DRAFT,
+        userId: currentUserId,
+        timeExecutionInMs: 0,
+        memoryUsageInKb: 0,
+      },
+    });
+    return newDraft.submissionId;
+
+    // find last draft
+  }
+  async getLatestDraft(problemId: string, languageId: number) {
+    const currentUserId = await this.getCurrentUserId();
+    if (!currentUserId) {
+      throw new Error("Not authenticated.");
+    }
+    const draft = await this.prisma.submission.findFirst({
+      where: {
+        userId: currentUserId,
+        problemId,
+        languageId,
+        status: SubmissionStatus.DRAFT,
+      },
+    });
+    return draft;
   }
 }

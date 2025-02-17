@@ -2,6 +2,7 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { type SubmissionResult } from "@/server/grpc/generated/execution_service";
 import { runCodeInput } from "@/server/schema/submission.dto";
 import { type ClientReadableStream } from "@grpc/grpc-js";
+import { z } from "zod";
 function waitRandomTime() {
   return new Promise((resolve) => {
     setTimeout(resolve, Math.random() * 1000);
@@ -33,4 +34,23 @@ export const submissionRouter = createTRPCRouter({
       }
     }),
   },
+  saveDraft: publicProcedure.input(runCodeInput).mutation(async function ({
+    input,
+    ctx: {
+      services: { submission },
+    },
+  }) {
+    return await submission.saveDraft(input);
+  }),
+  getLatestDraft: publicProcedure
+    .input(z.object({ problemId: z.string(), languageId: z.number() }))
+
+    .query(async function ({
+      input,
+      ctx: {
+        services: { submission },
+      },
+    }) {
+      return await submission.getLatestDraft(input.problemId, input.languageId);
+    }),
 });

@@ -3,6 +3,7 @@ import {
   ExecutionServiceClient,
   Language,
   Submission,
+  SubmissionSettings,
   TestCase,
 } from "./generated/execution_service";
 
@@ -10,7 +11,7 @@ async function main() {
   // Khởi tạo client
 
   const client = new ExecutionServiceClient(
-    "103.82.194.100:50051",
+    process.env.GRPC_ENDPOINT || "localhost:50051",
     grpc.credentials.createInsecure(),
   );
 
@@ -70,6 +71,11 @@ int main() {
 }
 `,
     test_cases: [testCase1, testCase2, testCase3, testCase4],
+    settings: new SubmissionSettings({
+      with_case_sensitive: false,
+      with_trim: true,
+      with_whitespace: true,
+    }),
   });
 
   const stream = client.Execute(submission);

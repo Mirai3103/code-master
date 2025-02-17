@@ -5,7 +5,7 @@ export const runCodeInput = z.object({
   userId: z.string(),
   problemId: z.string(),
   languageId: z.number(),
-  isTest: z.boolean().default(true),
+  isTest: z.boolean().nullish().default(true),
 });
 
 export type RunCodeInput = z.infer<typeof runCodeInput>;

@@ -17,6 +17,7 @@ export const testcaseRouter = createTRPCRouter({
       );
       return testcases;
     }),
+
   getPublicTestcases: publicProcedure
     .input(
       z.object({
@@ -93,5 +94,18 @@ export const testcaseRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const result = await ctx.services.testcase.bulkDelete(input);
       return result;
+    }),
+
+  getAllTestcasesForSubmitting: publicProcedure
+    .input(
+      z.object({
+        problemId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const testcases = await ctx.services.testcase.findAllTestcases(
+        input.problemId,
+      );
+      return testcases;
     }),
 });
