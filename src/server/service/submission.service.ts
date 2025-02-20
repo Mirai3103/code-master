@@ -1,46 +1,70 @@
 import AbstractService from "./abstract.service";
+import { v4 as uuid } from "uuid";
 import {
-  type ExecutionServiceClient,
+  ExecutionServiceClient,
   Language,
   Submission,
   TestCase,
   SubmissionSettings,
+  SubmissionResult,
 } from "../grpc/generated/execution_service";
-import { v4 as uuid } from "uuid";
-import { type PrismaClient } from "@prisma/client";
-import { type RunCodeInput } from "../schema/submission.dto";
-import { SubmissionStatus } from "../schema/enum";
+import { PrismaClient } from "@prisma/client";
+import { RunCodeInput } from "../schema/submission.dto";
+import {
+  mapToSubmissionStatus,
+  SubmissionStatus,
+  SubmissionTestcaseStatus,
+} from "../schema/enum";
+
+// Interfaces for better type safety
+interface ProblemLimits {
+  timeLimitInMs: number;
+  memoryLimitInKb: number;
+}
+
+interface LanguageConfig {
+  memoryLimitInKb?: number;
+  timeLimitInMs?: number;
+  language: {
+    binaryFileExt: string | null;
+    compileCommand: string | null;
+    runCommand: string | null;
+    sourceFileExt: string | null;
+  };
+}
+
+interface TestCaseData {
+  testCaseId: string;
+  inputData: string | null;
+  expectedOutput: string | null;
+}
 
 export class SubmissionService extends AbstractService {
-  private readonly executionServiceClient: ExecutionServiceClient;
-
   constructor(
-    db: PrismaClient,
-    executionServiceClient: ExecutionServiceClient,
+    private readonly db: PrismaClient,
+    private readonly executionServiceClient: ExecutionServiceClient,
   ) {
     super(db);
-    this.executionServiceClient = executionServiceClient;
   }
 
-  public async testRunCode(input: RunCodeInput) {
-    const { code, languageId, problemId, isTest } = input;
-
-    // Tìm thông tin problem
-    const problem = await this.prisma.problem.findUnique({
-      where: { problemId: problemId },
-      select: {
-        timeLimitInMs: true,
-        memoryLimitInKb: true,
-      },
+  private async getProblemLimits(problemId: string): Promise<ProblemLimits> {
+    const problem = await this.db.problem.findUnique({
+      where: { problemId },
+      select: { timeLimitInMs: true, memoryLimitInKb: true },
     });
 
     if (!problem) {
-      throw new Error(`Problem with Id ${problemId} not found.`);
+      throw new Error(`Problem with ID ${problemId} not found`);
     }
+    return problem;
+  }
 
-    // Tìm thông tin ngôn ngữ của problem
-    const problemLanguage = await this.prisma.problemLanguage.findFirst({
-      where: { languageId, problemId: problemId },
+  private async getLanguageConfig(
+    problemId: string,
+    languageId: number,
+  ): Promise<LanguageConfig> {
+    const problemLanguage = await this.db.problemLanguage.findFirst({
+      where: { languageId, problemId },
       select: {
         memoryLimitInKb: true,
         timeLimitInMs: true,
@@ -57,45 +81,52 @@ export class SubmissionService extends AbstractService {
 
     if (!problemLanguage) {
       throw new Error(
-        `Language with Id ${languageId} not supported for problem ${problemId}.`,
+        `Language ID ${languageId} not supported for problem ${problemId}`,
       );
     }
+    return problemLanguage;
+  }
 
-    // Tìm các test case mẫu
-    const problemTestCases = await this.prisma.testcase.findMany({
-      where: {
-        problemId: problemId,
-        ...(isTest ? { isSample: true } : {}),
-      },
-      select: {
-        testCaseId: true,
-        inputData: true,
-        expectedOutput: true,
-      },
+  private async getTestCases(
+    problemId: string,
+    isTest: boolean,
+  ): Promise<TestCaseData[]> {
+    const testCases = await this.db.testcase.findMany({
+      where: { problemId, ...(isTest ? { isSample: true } : {}) },
+      select: { testCaseId: true, inputData: true, expectedOutput: true },
     });
-    if (problemTestCases.length === 0) {
-      throw new Error(`No sample test cases found for problem ${problemId}.`);
-    }
 
-    // Tạo đối tượng Submission
-    const submission = new Submission({
-      code,
-      id: uuid(),
+    if (testCases.length === 0) {
+      throw new Error(`No test cases found for problem ${problemId}`);
+    }
+    return testCases;
+  }
+
+  private createSubmission(
+    input: RunCodeInput,
+    problem: ProblemLimits,
+    languageConfig: LanguageConfig,
+    testCases: TestCaseData[],
+  ): Submission {
+    const submissionId = uuid();
+    return new Submission({
+      id: submissionId,
+      code: input.code,
       language: new Language({
-        binary_file_ext: problemLanguage.language.binaryFileExt || "",
-        compile_command: problemLanguage.language.compileCommand || "",
-        run_command: problemLanguage.language.runCommand || "",
-        source_file_ext: problemLanguage.language.sourceFileExt || "",
+        binary_file_ext: languageConfig.language.binaryFileExt ?? "",
+        compile_command: languageConfig.language.compileCommand ?? "",
+        run_command: languageConfig.language.runCommand ?? "",
+        source_file_ext: languageConfig.language.sourceFileExt ?? "",
       }),
       memory_limit:
-        (problemLanguage.memoryLimitInKb || problem.memoryLimitInKb) * 1024,
-      time_limit: problemLanguage.timeLimitInMs || problem.timeLimitInMs,
-      test_cases: problemTestCases.map(
-        (testCase) =>
+        (languageConfig.memoryLimitInKb ?? problem.memoryLimitInKb) * 1024,
+      time_limit: languageConfig.timeLimitInMs ?? problem.timeLimitInMs,
+      test_cases: testCases.map(
+        (tc) =>
           new TestCase({
-            expect_output: testCase.expectedOutput || "",
-            input: testCase.inputData || "",
-            id: testCase.testCaseId,
+            id: tc.testCaseId,
+            input: tc.inputData ?? "",
+            expect_output: tc.expectedOutput ?? "",
           }),
       ),
       settings: new SubmissionSettings({
@@ -104,62 +135,173 @@ export class SubmissionService extends AbstractService {
         with_whitespace: true,
       }),
     });
-
-    // Gọi gRPC client để thực thi submission
-    const result = this.executionServiceClient.Execute(submission);
-
-    return result;
   }
-  async saveDraft(input: Omit<RunCodeInput, "isTest">) {
-    const currentUserId = await this.getCurrentUserId();
-    if (!currentUserId) {
-      throw new Error("Not authenticated.");
+
+  public async testRunCode(input: RunCodeInput) {
+    const { problemId, languageId, isTest } = input;
+
+    // Fetch required data
+    const [problem, languageConfig, testCases] = await Promise.all([
+      this.getProblemLimits(problemId),
+      this.getLanguageConfig(problemId, languageId),
+      this.getTestCases(problemId, !!isTest),
+    ]);
+
+    // Create submission
+    const submission = this.createSubmission(
+      input,
+      problem,
+      languageConfig,
+      testCases,
+    );
+
+    // Save submission if not a test run
+    if (!isTest) {
+      const userId = await this.getCurrentUserId();
+      if (!userId) throw new Error("Not authenticated");
+
+      await this.db.submission.create({
+        data: {
+          submissionId: submission.id,
+          code: input.code,
+          languageId,
+          problemId,
+          status: SubmissionStatus.PENDING,
+          timeExecutionInMs: 0,
+          memoryUsageInKb: 0,
+          userId,
+        },
+      });
     }
+
+    // Execute submission
+    return this.executionServiceClient.Execute(submission);
+  }
+
+  public async saveDraft(input: Omit<RunCodeInput, "isTest">): Promise<string> {
+    const userId = await this.getCurrentUserId();
+    if (!userId) throw new Error("Not authenticated");
+
     const { code, languageId, problemId } = input;
-    const draft = await this.prisma.submission.findFirst({
+    const existingDraft = await this.db.submission.findFirst({
       where: {
-        userId: currentUserId,
+        userId,
         problemId,
         languageId,
         status: SubmissionStatus.DRAFT,
       },
     });
-    if (draft) {
-      await this.prisma.submission.update({
-        where: { submissionId: draft.submissionId },
+
+    if (existingDraft) {
+      await this.db.submission.update({
+        where: { submissionId: existingDraft.submissionId },
         data: { code },
       });
-      return draft.submissionId;
+      return existingDraft.submissionId;
     }
 
-    const newDraft = await this.prisma.submission.create({
+    const newDraft = await this.db.submission.create({
       data: {
+        submissionId: uuid(),
         code,
         languageId,
         problemId,
         status: SubmissionStatus.DRAFT,
-        userId: currentUserId,
+        userId,
         timeExecutionInMs: 0,
         memoryUsageInKb: 0,
       },
     });
     return newDraft.submissionId;
-
-    // find last draft
   }
-  async getLatestDraft(problemId: string, languageId: number) {
-    const currentUserId = await this.getCurrentUserId();
-    if (!currentUserId) {
-      throw new Error("Not authenticated.");
-    }
-    const draft = await this.prisma.submission.findFirst({
+
+  public async getLatestDraft(problemId: string, languageId: number) {
+    const userId = await this.getCurrentUserId();
+    if (!userId) throw new Error("Not authenticated");
+
+    return this.db.submission.findFirst({
       where: {
-        userId: currentUserId,
+        userId,
         problemId,
         languageId,
         status: SubmissionStatus.DRAFT,
       },
     });
-    return draft;
+  }
+
+  public async getSubmissionById(submissionId: string) {
+    return this.db.submission.findUnique({
+      where: { submissionId },
+    });
+  }
+
+  public async addSubmissionTestcaseResult(result: SubmissionResult) {
+    const {
+      submission_id,
+      test_case_id,
+      status,
+      stdout,
+      memory_usage,
+      time_usage,
+    } = result;
+
+    const [submission, testcase] = await Promise.all([
+      this.db.submission.findUnique({ where: { submissionId: submission_id } }),
+      this.db.testcase.findUnique({ where: { testCaseId: test_case_id } }),
+    ]);
+
+    if (!submission) {
+      throw new Error(`Submission with ID ${submission_id} not found`);
+    }
+    if (!testcase) {
+      throw new Error(`Testcase with ID ${test_case_id} not found`);
+    }
+
+    return this.db.submissionTestcase.create({
+      data: {
+        submissionId: submission_id,
+        testcaseId: test_case_id,
+        status,
+        stdout,
+        problemId: submission.problemId,
+        memoryUsedInKb: memory_usage,
+        runtimeInMs: time_usage * 1000,
+      },
+    });
+  }
+
+  public async recalculateSubmission(submissionId: string) {
+    const submission = await this.db.submission.findUnique({
+      where: { submissionId },
+    });
+    if (!submission) {
+      throw new Error(`Submission with ID ${submissionId} not found`);
+    }
+
+    const testcases = await this.db.submissionTestcase.findMany({
+      where: { submissionId },
+    });
+
+    const status = mapToSubmissionStatus(
+      testcases.map((tc) => tc.status as SubmissionTestcaseStatus),
+    );
+    const calculateAvg = (values: number[]) =>
+      values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
+
+    const timeExecutionInMsAvg = calculateAvg(
+      testcases.map((tc) => tc.runtimeInMs),
+    );
+    const memoryUsageInKbAvg = calculateAvg(
+      testcases.map((tc) => tc.memoryUsedInKb),
+    );
+
+    return this.db.submission.update({
+      where: { submissionId },
+      data: {
+        status,
+        memoryUsageInKb: memoryUsageInKbAvg,
+        timeExecutionInMs: timeExecutionInMsAvg,
+      },
+    });
   }
 }

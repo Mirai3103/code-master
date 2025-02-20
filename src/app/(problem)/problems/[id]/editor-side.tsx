@@ -24,7 +24,10 @@ import { useIsClient } from "usehooks-ts";
 import TestcaseRunner from "./testcase";
 import { trpc } from "@/trpc/react";
 import { type TestCase } from "@/server/schema/testcase.schema";
-import { SubmissionTestcaseStatus } from "@/server/schema/enum";
+import {
+  SubmissionStatus,
+  SubmissionTestcaseStatus,
+} from "@/server/schema/enum";
 import { useSession } from "next-auth/react";
 import { toast } from "@/app/_hooks/use-toast";
 import { useProblemEditorContext } from "./context";
@@ -283,8 +286,13 @@ function SubmittingButton({
   getCode,
   getLanguageId,
 }: ISubmittingButtonProps) {
-  const { setIsShowSubmitTab, setSubmissionStatus, setTabValue, setTestcases } =
-    useProblemEditorContext();
+  const {
+    setIsShowSubmitTab,
+    setSubmissionStatus,
+    setTabValue,
+    setTestcases,
+    setSubmissionId,
+  } = useProblemEditorContext();
   const { mutateAsync, isPending } =
     trpc.submissions.runCode.iterable.useMutation();
   const handleSubmission = () => {
@@ -296,6 +304,7 @@ function SubmittingButton({
     );
     setIsShowSubmitTab(true);
     setTabValue("submit");
+    setSubmissionStatus(SubmissionStatus.PENDING);
     mutateAsync({
       code: getCode(),
       problemId: problemId,
@@ -303,8 +312,12 @@ function SubmittingButton({
       languageId: getLanguageId(),
       isTest: false,
     }).then(async (asynGen) => {
+      let submissionId = "";
       for await (const i of asynGen) {
         console.log("runCode", i);
+        if (!submissionId) {
+          submissionId = i.submissionId;
+        }
         setTestcases((testcases) =>
           testcases.map((testcase) => {
             if (testcase.testCaseId == i.testCaseId) {
@@ -318,6 +331,7 @@ function SubmittingButton({
           }),
         );
       }
+      setSubmissionId(submissionId);
     });
   };
 

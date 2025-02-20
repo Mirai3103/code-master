@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Submission" ALTER COLUMN "userId" SET DATA TYPE VARCHAR(100);

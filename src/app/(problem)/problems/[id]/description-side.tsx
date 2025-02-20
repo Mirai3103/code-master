@@ -93,8 +93,13 @@ interface ISubmittingTabProps {
 }
 
 function SubmittingTab({ problemId }: ISubmittingTabProps) {
-  const { testcases, setTestcases, isShowSubmitTab, submissionStatus } =
-    useProblemEditorContext();
+  const {
+    testcases,
+    setTestcases,
+    isShowSubmitTab,
+    submissionStatus,
+    submissionId,
+  } = useProblemEditorContext();
 
   const { data } = trpc.testcases.getAllTestcasesForSubmitting.useQuery({
     problemId,
@@ -118,6 +123,10 @@ function SubmittingTab({ problemId }: ISubmittingTabProps) {
     );
   }, [testcases]);
   const process = (completedTestcases / (testcases?.length || 1)) * 100;
+  const { data: submission, isLoading } =
+    trpc.submissions.getSubmissionById.useQuery(problemId, {
+      enabled: !!submissionId,
+    });
 
   if (!isShowSubmitTab) {
     return null;
@@ -128,12 +137,14 @@ function SubmittingTab({ problemId }: ISubmittingTabProps) {
         <h2 className="mb-2 text-2xl font-bold">Trạng thái bài nộp của bạn</h2>
         <Badge
           variant={
-            submissionStatus === SubmissionStatus.ACCEPTED
-              ? "success"
-              : "destructive"
+            SubmissionStatusVariant[
+              (submission?.status as SubmissionStatus) || submissionStatus
+            ] as any
           }
         >
-          {SubmissionStatusDisplay[submissionStatus] || "Unknown"}
+          {SubmissionStatusDisplay[
+            (submission?.status as SubmissionStatus) || submissionStatus
+          ] || "Unknown"}
         </Badge>
       </div>
       <div>
@@ -193,4 +204,15 @@ const SubmissionStatusDisplay = {
   [SubmissionStatus.PENDING]: "Đang chờ",
   [SubmissionStatus.WRONG_ANSWER]: "Sai kết quả",
   [SubmissionStatus.TIME_LIMIT_EXCEEDED]: "Vượt quá giới hạn thời gian",
+};
+
+const SubmissionStatusVariant = {
+  [SubmissionStatus.ACCEPTED]: "default",
+  [SubmissionStatus.COMPILE_ERROR]: "danger",
+  [SubmissionStatus.RUNTIME_ERROR]: "danger",
+  [SubmissionStatus.DRAFT]: "secondary",
+  [SubmissionStatus.MEMORY_LIMIT_EXCEEDED]: "danger",
+  [SubmissionStatus.PENDING]: "secondary",
+  [SubmissionStatus.WRONG_ANSWER]: "danger",
+  [SubmissionStatus.TIME_LIMIT_EXCEEDED]: "danger",
 };

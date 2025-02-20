@@ -37,3 +37,19 @@ export enum SubmissionTestcaseStatus {
   RUNNING = "Running",
   NONE = "None",
 }
+
+export function mapToSubmissionStatus(sts: SubmissionTestcaseStatus[]) {
+  if (sts.includes(SubmissionTestcaseStatus.RUNNING))
+    return SubmissionStatus.PENDING;
+  if (sts.includes(SubmissionTestcaseStatus.CompileError))
+    return SubmissionStatus.COMPILE_ERROR;
+  if (sts.includes(SubmissionTestcaseStatus.RuntimeError))
+    return SubmissionStatus.RUNTIME_ERROR;
+  if (sts.includes(SubmissionTestcaseStatus.WrongAnswer))
+    return SubmissionStatus.WRONG_ANSWER;
+  if (sts.includes(SubmissionTestcaseStatus.TimeLimitExceeded))
+    return SubmissionStatus.TIME_LIMIT_EXCEEDED;
+  if (sts.includes(SubmissionTestcaseStatus.MemoryLimitExceeded))
+    return SubmissionStatus.MEMORY_LIMIT_EXCEEDED;
+  return SubmissionStatus.ACCEPTED;
+}

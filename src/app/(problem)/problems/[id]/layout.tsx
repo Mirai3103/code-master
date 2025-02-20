@@ -14,6 +14,7 @@ export default function MainLayout({
   const [submissionStatus, setSubmissionStatus] =
     React.useState<SubmissionStatus>(SubmissionStatus.DRAFT);
   const [tabValue, setTabValue] = React.useState("description");
+  const [submissionId, setSubmissionId] = React.useState("");
 
   return (
     <ProblemEditorProvider
@@ -26,6 +27,8 @@ export default function MainLayout({
         setSubmissionStatus,
         tabValue,
         setTabValue,
+        submissionId,
+        setSubmissionId,
       }}
     >
       {children}

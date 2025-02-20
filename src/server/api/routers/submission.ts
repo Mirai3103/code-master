@@ -19,10 +19,13 @@ export const submissionRouter = createTRPCRouter({
       // grpc call
       const readableStream: ClientReadableStream<SubmissionResult> =
         await submission.testRunCode(input);
-
+      let submissionId = "";
       for await (const response of readableStream) {
         const result = response as SubmissionResult;
-        await waitRandomTime();
+        if (!input.isTest) await submission.addSubmissionTestcaseResult(result);
+        if (submissionId === "") {
+          submissionId = result.submission_id;
+        }
         yield {
           submissionId: result.submission_id,
           testCaseId: result.test_case_id,
@@ -32,6 +35,7 @@ export const submissionRouter = createTRPCRouter({
           timeUsage: result.time_usage,
         };
       }
+      if (!input.isTest) await submission.recalculateSubmission(submissionId);
     }),
   },
   saveDraft: publicProcedure.input(runCodeInput).mutation(async function ({
@@ -53,4 +57,10 @@ export const submissionRouter = createTRPCRouter({
     }) {
       return await submission.getLatestDraft(input.problemId, input.languageId);
     }),
+  getSubmissionById: publicProcedure.input(z.string()).query(async function ({
+    input,
+    ctx: { services },
+  }) {
+    return await services.submission.getSubmissionById(input);
+  }),
 });

@@ -18,6 +18,8 @@ interface ProblemEditorContextValue {
   setSubmissionStatus: (value: SubmissionStatus) => void;
   tabValue: string;
   setTabValue: (value: string) => void;
+  submissionId: string;
+  setSubmissionId: (value: string) => void;
 }
 
 const ProblemEditorContext = createContext<
