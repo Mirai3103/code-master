@@ -12,6 +12,9 @@ export default {
   plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
   theme: {
     extend: {
+      width: {
+        "max-w-8xl": "90rem",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
