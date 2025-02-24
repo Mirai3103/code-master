@@ -1,8 +1,13 @@
+import { QUERY_CONSTANTS } from "@/constants/query";
 import z from "zod";
 
 export const paginationQuerySchema = z.object({
-  page: z.number().int().positive().default(1),
-  pageSize: z.number().int().positive().default(10),
+  page: z.coerce.number().int().positive().default(1),
+  pageSize: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(QUERY_CONSTANTS.DEFAULT_PAGE_SIZE),
   orderBy: z.string().nullish(),
   order: z.enum(["asc", "desc"]).nullish(),
 });

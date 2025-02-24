@@ -357,8 +357,6 @@ mark[style] > strong {
   animation: slide-up 0.8s ease-out;
 }
 
-
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -366,4 +364,24 @@ mark[style] > strong {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.long-code-block::-webkit-scrollbar {
+  @apply h-2 w-2 rounded-md;
+}
+
+.long-code-block::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+.long-code-block::-webkit-scrollbar-thumb {
+  @apply bg-gray-300;
+}
+
+.dark .long-code-block::-webkit-scrollbar-track {
+  @apply bg-neutral-700;
+}
+
+.dark .long-code-block::-webkit-scrollbar-thumb {
+  @apply bg-neutral-500;
 }

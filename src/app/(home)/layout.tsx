@@ -33,6 +33,8 @@ const userNavigation = [
   { name: "Trợ Giúp", href: "/help" },
   { name: "Đăng Xuất", href: "/logout" },
 ];
+// /problems/a94e8c8e-69e3-4ada-92a7-22bfc159e9b3
+const EXCEPT_PATHS = [/^\/problems\/[a-f0-9-]+$/];
 const UserLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -43,6 +45,10 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
       current: pathname.startsWith(item.href),
     }));
   }, [pathname]);
+  const isExceptPath = React.useMemo(() => {
+    return EXCEPT_PATHS.some((path) => path.test(pathname));
+  }, [pathname]);
+  console.log("pathname", pathname, "isExceptPath", isExceptPath);
 
   const UserAvatar = () => (
     <div className="flex items-center gap-2">
@@ -63,7 +69,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Top Navigation Bar */}
       <div className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-header flex items-center justify-between">
+          <div className="flex h-header items-center justify-between">
             {/* Left section - Logo and Navigation */}
             <div className="flex flex-1 items-center">
               <div className="flex flex-shrink-0 items-center">
@@ -176,8 +182,8 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Main Content */}
       <main
         className={cn(
-          "h-content-screen mx-auto",
-          pathname !== "/test" && "max-w-8xl px-4 py-2 sm:px-6 lg:px-8",
+          "mx-auto h-content-screen",
+          !isExceptPath && "max-w-8xl px-4 py-2 sm:px-6 lg:px-8",
         )}
       >
         {children}

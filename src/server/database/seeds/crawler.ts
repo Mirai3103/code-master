@@ -147,7 +147,14 @@ async function getProblemsDetail(
       extensions,
     ),
   };
+  const exitsTitle = await prisma.problem.findFirst({
+    where: { title: rest.title },
+  });
+  if (exitsTitle) {
+    return rest;
+  }
   const tags = await saveTags(response.data.topicTags);
+
   const newProb = await prisma.problem.create({
     data: rest,
   });
@@ -166,7 +173,7 @@ async function getProblemsDetail(
 
 async function main() {
   const response = await axios.get<ProblemsResponse>(
-    "https://alfa-leetcode-api.onrender.com/problems",
+    "https://alfa-leetcode-api.onrender.com/problems?skip=40&limit=100",
   );
 
   const briefProblems = response.data.problemsetQuestionList;
