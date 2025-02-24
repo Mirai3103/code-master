@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { LuSearch as Search, LuShuffle as Shuffle } from "react-icons/lu";
+import { LuEraser, LuSearch as Search } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,7 +17,15 @@ import { useDebounce } from "use-debounce";
 import { Controller, useForm } from "react-hook-form";
 import { DifficultyLevel, parseDifficultyLevel } from "@/server/schema/enum";
 
-const tags = [
+// Tách tags ra constant riêng để tránh re-render
+const DIFFICULTY_OPTIONS = [
+  { label: "Tất cả độ khó", value: "0" },
+  { label: "Dễ", value: DifficultyLevel.EASY.toString() },
+  { label: "Trung bình", value: DifficultyLevel.MEDIUM.toString() },
+  { label: "Khó", value: DifficultyLevel.HARD.toString() },
+] as const;
+
+const TAG_OPTIONS = [
   "Array",
   "String",
   "Hash Table",
@@ -33,7 +41,7 @@ const tags = [
   "Matrix",
   "Two Pointers",
   "Bit Manipulation",
-];
+].map((tag) => ({ label: tag, value: tag }));
 
 interface FilterParams {
   search?: string;
@@ -46,12 +54,18 @@ export default function ProblemFilters() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const { control, watch } = useForm<FilterParams>({
-    defaultValues: {
+  // Memo defaultValues để tránh re-render không cần thiết
+  const defaultValues = useMemo(
+    () => ({
       search: searchParams.get("search") || "",
       difficulty: parseDifficultyLevel(searchParams.get("difficulty")),
       tags: searchParams.getAll("tags"),
-    },
+    }),
+    [searchParams],
+  );
+
+  const { control, watch } = useForm<FilterParams>({
+    defaultValues,
   });
 
   const search = watch("search");
@@ -59,92 +73,116 @@ export default function ProblemFilters() {
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  // Sử dụng useCallback để tối ưu function
+  const updateSearchParams = useCallback(
+    (params: URLSearchParams) => {
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [pathname, router],
+  );
+
   useEffect(() => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams);
     if (debouncedSearch) {
       params.set("search", debouncedSearch);
+    } else {
+      params.delete("search");
     }
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [debouncedSearch, pathname, router]);
+    updateSearchParams(params);
+  }, [debouncedSearch, updateSearchParams, searchParams]);
 
   const applyFilters = useCallback(() => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams);
     const { search, difficulty, tags } = watch();
+
+    // Xử lý search
     if (search) {
       params.set("search", search);
+    } else {
+      params.delete("search");
     }
+
+    // Xử lý difficulty
     if (difficulty) {
       params.set("difficulty", difficulty.toString());
-    }
-    if (tags) {
-      tags.forEach((tag) => params.append("tags", tag));
+    } else {
+      params.delete("difficulty");
     }
 
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [pathname, router, watch]);
-  const tagids = watch("tags");
+    // Xử lý tags
+    params.delete("tags"); // Xóa tất cả tags cũ
+    tags?.forEach((tag) => params.append("tags", tag));
+
+    updateSearchParams(params);
+  }, [searchParams, watch, updateSearchParams]);
+
+  const tagIds = watch("tags");
   const selectedTags = useMemo(
-    () => tagids?.map((tag) => ({ label: tag, value: tag })) || [],
-    [tagids?.length],
+    () => tagIds?.map((tag) => ({ label: tag, value: tag })) || [],
+    [tagIds],
   );
-  console.log("rendering ProblemFilters");
+  const handleClear = useCallback(() => {
+    const page = searchParams.get("page") || "1";
+    const pageSize = searchParams.get("pageSize") || "20";
+    const params = new URLSearchParams();
+    params.set("page", page);
+    params.set("pageSize", pageSize);
+    updateSearchParams(params);
+
+    searchInputRef.current?.focus();
+  }, []);
+
   return (
-    <div className="mb-6 grid grid-cols-12 gap-4">
-      <div className="relative col-span-2">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-        <Controller
-          control={control}
-          name="search"
-          render={({ field }) => (
-            <Input
-              {...field}
-              placeholder="Tìm kiếm bài tập..."
-              className="pl-9"
-              ref={searchInputRef}
-            />
-          )}
-        />
+    <div className="flex w-full flex-col items-center justify-center gap-2">
+      <div className="flex w-full gap-4">
+        <div className="relative basis-1/2">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <Controller
+            control={control}
+            name="search"
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder="Tìm kiếm bài tập..."
+                className="w-full pl-9"
+                ref={searchInputRef}
+              />
+            )}
+          />
+        </div>
+
+        <div className="basis-1/2">
+          <Controller
+            control={control}
+            name="difficulty"
+            render={({ field }) => (
+              <Select
+                value={field.value?.toString() || ""}
+                onValueChange={field.onChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Độ khó" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DIFFICULTY_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
       </div>
 
-      <div className="col-span-2">
-        <Controller
-          control={control}
-          name="difficulty"
-          render={({ field }) => (
-            <Select
-              value={field.value?.toString() || ""}
-              onValueChange={field.onChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Độ khó" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">Tất cả độ khó</SelectItem>
-                <SelectItem value={DifficultyLevel.EASY.toString()}>
-                  Dễ
-                </SelectItem>
-                <SelectItem value={DifficultyLevel.MEDIUM.toString()}>
-                  Trung bình
-                </SelectItem>
-                <SelectItem value={DifficultyLevel.HARD.toString()}>
-                  Khó
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        />
-      </div>
-
-      <div className="col-span-3">
+      <div className="w-full flex-1">
         <Controller
           control={control}
           name="tags"
           render={({ field }) => (
             <FancyMultiSelect
-              options={tags.map((tag) => ({
-                label: tag,
-                value: tag,
-              }))}
+              options={TAG_OPTIONS}
               placeholder="Chọn thẻ"
               onChange={(setAction) => {
                 if (typeof setAction === "function") {
@@ -155,19 +193,20 @@ export default function ProblemFilters() {
                 field.onChange(setAction.map((tag) => tag.value));
               }}
               selectedOptions={selectedTags}
+              className="w-full"
             />
           )}
         />
       </div>
-
-      <div className="col-span-1">
+      <div className="grid w-full grid-cols-2 gap-2">
         <Button onClick={applyFilters}>Áp dụng</Button>
-      </div>
-
-      <div className="col-span-1">
-        <Button variant="outline" className="flex items-center gap-2">
-          <Shuffle className="h-4 w-4" />
-          Random
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={handleClear}
+        >
+          <LuEraser className="h-4 w-4" />
+          Clear
         </Button>
       </div>
     </div>

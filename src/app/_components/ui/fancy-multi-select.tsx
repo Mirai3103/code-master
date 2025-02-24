@@ -48,6 +48,7 @@ interface FancyMultiSelectProps {
   onCreateNew?: (label: string) => FancyMultiSelectOption;
   createNewProps?: CreateNewProps;
   floatingList?: boolean;
+  className?: string;
 }
 
 // Separate Dialog Component
@@ -121,6 +122,7 @@ export const FancyMultiSelect = React.forwardRef<
       onCreateNew,
       createNewProps = {},
       floatingList = true,
+      className,
     },
     ref,
   ) => {
@@ -178,7 +180,7 @@ export const FancyMultiSelect = React.forwardRef<
     return (
       <Command
         onKeyDown={handleKeyDown}
-        className="overflow-visible bg-transparent"
+        className={cn("overflow-visible bg-transparent", className)}
         aria-label="Fancy multi-select"
       >
         {withCreateNew && (

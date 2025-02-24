@@ -1,20 +1,13 @@
 import { Card } from "@/app/_components/ui/card";
-import { Input } from "@/app/_components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/_components/ui/select";
 import { Problem } from "@/server/schema/problem.schema";
 import {
   getDifficultyBg,
   getDifficultyColor,
   getDifficultyText,
 } from "./utils";
-import { LuCircle, LuCircleCheck, LuSearch } from "react-icons/lu";
+import { LuCircle, LuCircleCheck } from "react-icons/lu";
 import { Button } from "@/app/_components/ui/button";
+import ProblemFilters from "./filter";
 interface Props {
   problems: Problem[];
 }
@@ -23,35 +16,8 @@ export default function ProblemsTable({ problems }: Props) {
   return (
     <div className="col-span-6 space-y-6">
       {/* Filters */}
-      <Card className="p-6">
-        <div className="flex flex-wrap gap-4">
-          <div className="relative min-w-[200px] flex-1">
-            <LuSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-            <Input placeholder="Tìm kiếm bài tập..." className="w-full pl-10" />
-          </div>
-          <Select defaultValue="all">
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Độ Khó" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất Cả</SelectItem>
-              <SelectItem value="easy">Dễ</SelectItem>
-              <SelectItem value="medium">Trung Bình</SelectItem>
-              <SelectItem value="hard">Khó</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select defaultValue="all">
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Trạng Thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất Cả</SelectItem>
-              <SelectItem value="solved">Đã Giải</SelectItem>
-              <SelectItem value="attempted">Đã Thử</SelectItem>
-              <SelectItem value="unsolved">Chưa Giải</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <Card className="p-4 pb-2">
+        <ProblemFilters />
       </Card>
 
       {/* Problems List */}

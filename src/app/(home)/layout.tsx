@@ -48,7 +48,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="flex items-center gap-2">
       <img
         className="h-8 w-8 rounded-full"
-        src="/api/placeholder/32/32"
+        src="https://placewaifu.com/image/200/200"
         alt="User avatar"
       />
       <div className="hidden md:block">
