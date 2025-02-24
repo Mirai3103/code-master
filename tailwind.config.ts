@@ -15,6 +15,13 @@ export default {
       width: {
         "max-w-8xl": "90rem",
       },
+      height: {
+        header: "4rem",
+        "content-screen": "calc(100vh - 4rem - 3px)",
+      },
+      minHeight: {
+        "content-screen": "calc(100vh - 4rem - 10px)",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

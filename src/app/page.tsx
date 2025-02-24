@@ -9,6 +9,7 @@ import {
   LuGithub as Github,
 } from "react-icons/lu";
 import React from "react";
+import Link from "next/link";
 
 const LandingPage = () => {
   return (
@@ -24,8 +25,9 @@ const LandingPage = () => {
             <Button
               variant="ghost"
               className="text-gray-600 hover:text-gray-900"
+              asChild
             >
-              Bài Tập
+              <Link href="/problems">Bài tập</Link>
             </Button>
             <Button
               variant="ghost"
@@ -57,9 +59,13 @@ const LandingPage = () => {
             coding với các bài tập thực tế
           </p>
           <div className="flex justify-center space-x-4">
-            <Button className="bg-blue-600 px-8 py-6 text-lg text-white hover:bg-blue-700">
-              Bắt Đầu Ngay
-              <ChevronRight className="ml-2 h-5 w-5" />
+            <Button
+              className="bg-blue-600 px-8 py-6 text-lg text-white hover:bg-blue-700"
+              asChild
+            >
+              <Link href={"/problems"}>
+                Bắt Đầu Ngay <ChevronRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
             <Button
               variant="outline"
@@ -147,7 +153,5 @@ const StatCard = ({ number, label }: { number: string; label: string }) => (
     <div className="text-gray-600">{label}</div>
   </div>
 );
-
-// Add these animations to your global CSS
 
 export default LandingPage;

@@ -356,3 +356,14 @@ mark[style] > strong {
 .animate-slide-up {
   animation: slide-up 0.8s ease-out;
 }
+
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

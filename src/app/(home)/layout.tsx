@@ -6,7 +6,6 @@ import {
   LuTrophy as Trophy,
   LuUsers as Users,
   LuBell as Bell,
-  LuSearch as Search,
   LuMenu as Menu,
   LuX as X,
   LuHouse as LuHome,
@@ -19,24 +18,31 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { usePathname } from "next/navigation";
+import { cn } from "../_lib/utils";
+import Link from "next/link";
+const NAVIGATION = [
+  { name: "Trang Chủ", icon: LuHome, href: "/problems", current: true },
+  { name: "Khóa Học", icon: Book, href: "/courses", current: false },
+  { name: "Thi Đấu", icon: Trophy, href: "/contests", current: false },
+  { name: "Cộng Đồng", icon: Users, href: "/community", current: false },
+];
+const userNavigation = [
+  { name: "Hồ Sơ", href: "/profile" },
+  { name: "Cài Đặt", href: "/settings" },
+  { name: "Trợ Giúp", href: "/help" },
+  { name: "Đăng Xuất", href: "/logout" },
+];
 const UserLayout = ({ children }: { children: React.ReactNode }) => {
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navigation = [
-    { name: "Trang Chủ", icon: LuHome, href: "/", current: true },
-    { name: "Bài Tập", icon: Code2, href: "/problems", current: false },
-    { name: "Khóa Học", icon: Book, href: "/courses", current: false },
-    { name: "Thi Đấu", icon: Trophy, href: "/contest", current: false },
-    { name: "Cộng Đồng", icon: Users, href: "/community", current: false },
-  ];
-
-  const userNavigation = [
-    { name: "Hồ Sơ", href: "/profile" },
-    { name: "Cài Đặt", href: "/settings" },
-    { name: "Trợ Giúp", href: "/help" },
-    { name: "Đăng Xuất", href: "/logout" },
-  ];
+  const navigation = React.useMemo(() => {
+    return NAVIGATION.map((item) => ({
+      ...item,
+      current: pathname.startsWith(item.href),
+    }));
+  }, [pathname]);
 
   const UserAvatar = () => (
     <div className="flex items-center gap-2">
@@ -57,7 +63,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Top Navigation Bar */}
       <div className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+          <div className="h-header flex items-center justify-between">
             {/* Left section - Logo and Navigation */}
             <div className="flex flex-1 items-center">
               <div className="flex flex-shrink-0 items-center">
@@ -73,10 +79,12 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
                     <Menu className="h-6 w-6" />
                   )}
                 </Button>
-                <Code2 className="h-8 w-8 text-blue-600" />
-                <span className="ml-2 text-xl font-bold text-gray-900">
-                  CodePro
-                </span>
+                <Link href={"/"} className="flex items-center">
+                  <Code2 className="h-8 w-8 text-blue-600" />
+                  <span className="ml-2 text-xl font-bold text-gray-900">
+                    CodePro
+                  </span>
+                </Link>
               </div>
 
               {/* Desktop Navigation */}
@@ -86,23 +94,14 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
                     key={item.name}
                     variant={item.current ? "secondary" : "ghost"}
                     className="flex items-center"
+                    asChild
                   >
-                    <item.icon className="mr-2 h-4 w-4" />
-                    {item.name}
+                    <Link href={item.href}>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.name}
+                    </Link>
                   </Button>
                 ))}
-              </div>
-            </div>
-
-            {/* Center section - Search */}
-            <div className="mx-4 hidden max-w-lg flex-1 lg:block">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                <Input
-                  type="search"
-                  placeholder="Tìm kiếm bài tập..."
-                  className="w-full bg-gray-50 pl-10"
-                />
               </div>
             </div>
 
@@ -148,16 +147,6 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         {/* Search bar for mobile */}
-        <div className="px-4 pb-3 lg:hidden">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-            <Input
-              type="search"
-              placeholder="Tìm kiếm bài tập..."
-              className="w-full bg-gray-50 pl-10"
-            />
-          </div>
-        </div>
       </div>
 
       {/* Mobile Navigation Menu */}
@@ -185,7 +174,12 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
       )}
 
       {/* Main Content */}
-      <main className="max-w-8xl mx-auto px-4 py-2 sm:px-6 lg:px-8">
+      <main
+        className={cn(
+          "h-content-screen mx-auto",
+          pathname !== "/test" && "max-w-8xl px-4 py-2 sm:px-6 lg:px-8",
+        )}
+      >
         {children}
       </main>
     </div>
