@@ -8,7 +8,7 @@ import {
   SubmissionSettings,
   SubmissionResult,
 } from "../grpc/generated/execution_service";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { RunCodeInput } from "../schema/submission.dto";
 import {
   mapToSubmissionStatus,
@@ -172,10 +172,40 @@ export class SubmissionService extends AbstractService {
           userId,
         },
       });
+      await this.initSubmissionTestcases(submission.id, problemId);
     }
 
     // Execute submission
     return this.executionServiceClient.Execute(submission);
+  }
+
+  public async initSubmissionTestcases(
+    submissionId: string,
+    problemId: string,
+  ) {
+    await this.db.submissionTestcase.deleteMany({ where: { submissionId } });
+    const testCases = await this.db.testcase.findMany({
+      where: { problemId },
+    });
+
+    if (testCases.length === 0) {
+      throw new Error(`No test cases found for problem ${problemId}`);
+    }
+
+    const data: Prisma.SubmissionTestcaseCreateManyInput[] = testCases.map(
+      (tc) => ({
+        submissionId: submissionId,
+        testcaseId: tc.testCaseId,
+        status: SubmissionTestcaseStatus.RUNNING,
+        stdout: null,
+        problemId: problemId,
+        runtimeInMs: 0,
+        memoryUsedInKb: 0,
+      }),
+    );
+    console.log(data);
+
+    return this.db.submissionTestcase.createMany({ data });
   }
 
   public async saveDraft(input: Omit<RunCodeInput, "isTest">): Promise<string> {
@@ -229,13 +259,59 @@ export class SubmissionService extends AbstractService {
     });
   }
 
-  public async getSubmissionById(submissionId: string) {
+  public async getBriefSubmissionById(submissionId: string) {
     return this.db.submission.findUnique({
       where: { submissionId },
+      select: {
+        language: {
+          select: {
+            languageId: true,
+            languageName: true,
+            version: true,
+            sourceFileExt: true,
+          },
+        },
+        userId: true,
+        createdAt: true,
+        code: true,
+      },
     });
   }
+  public async getSubmissionById(submissionId: string) {
+    const submissionPromise = this.db.submission.findUnique({
+      where: { submissionId },
+      omit: {
+        code: true,
+        createdAt: true,
+      },
+    });
+    const testcasesPromise = this.db.submissionTestcase.findMany({
+      where: { submissionId },
+      include: {
+        testcase: {
+          select: {
+            label: true,
+            points: true,
+            testCaseId: true,
+            isSample: true,
+          },
+        },
+      },
+    });
+    const [submission, testcases] = await Promise.all([
+      submissionPromise,
+      testcasesPromise,
+    ]);
+    if (!submission) {
+      return null;
+    }
+    return {
+      ...submission,
+      testcases: testcases,
+    };
+  }
 
-  public async addSubmissionTestcaseResult(result: SubmissionResult) {
+  public async updateSubmissionTestcaseResult(result: SubmissionResult) {
     const {
       submission_id,
       test_case_id,
@@ -244,26 +320,16 @@ export class SubmissionService extends AbstractService {
       memory_usage,
       time_usage,
     } = result;
-
-    const [submission, testcase] = await Promise.all([
-      this.db.submission.findUnique({ where: { submissionId: submission_id } }),
-      this.db.testcase.findUnique({ where: { testCaseId: test_case_id } }),
-    ]);
-
-    if (!submission) {
-      throw new Error(`Submission with ID ${submission_id} not found`);
-    }
-    if (!testcase) {
-      throw new Error(`Testcase with ID ${test_case_id} not found`);
-    }
-
-    return this.db.submissionTestcase.create({
+    return this.db.submissionTestcase.update({
+      where: {
+        submissionId_testcaseId: {
+          submissionId: submission_id,
+          testcaseId: test_case_id,
+        },
+      },
       data: {
-        submissionId: submission_id,
-        testcaseId: test_case_id,
         status,
         stdout,
-        problemId: submission.problemId,
         memoryUsedInKb: memory_usage,
         runtimeInMs: time_usage * 1000,
       },
@@ -305,3 +371,11 @@ export class SubmissionService extends AbstractService {
     });
   }
 }
+
+export type SubmissionById = NonNullable<
+  Awaited<ReturnType<SubmissionService["getSubmissionById"]>>
+>;
+
+export type SubmissionBrief = Awaited<
+  ReturnType<SubmissionService["getBriefSubmissionById"]>
+>;

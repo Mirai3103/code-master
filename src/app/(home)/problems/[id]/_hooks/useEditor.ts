@@ -35,7 +35,7 @@ export function useEditor(languagesOfProblem: LanguageOfProblem[]) {
 
   // Get current code from editor
   const getCurrentCode = useCallback(() => {
-    return (monaco?.editor as any)?.getEditors()[0].getValue();
+    return (monaco?.editor as any)?.getEditors()[0].getValue() as string;
   }, [monaco]);
 
   // Get current selected language object

@@ -118,6 +118,7 @@ model Language {
   monacoCodeLanguage String?           @default("plaintext") @db.VarChar(50)
   templateCode       String            @default("")
   problemLanguages   ProblemLanguage[]
+  submissions        Submission[]
 
   @@map("Language")
 }
@@ -189,6 +190,7 @@ model Submission {
   deletedBy           String?              @db.VarChar(100)
   problem             Problem              @relation(fields: [problemId], references: [problemId], onDelete: NoAction, onUpdate: NoAction, map: "Submission_ProblemId_Problem_ProblemId_fk")
   submissionTestcases SubmissionTestcase[] @relation("SubmissionTestcase_SubmissionId_ToSubmission")
+  language            Language             @relation(fields: [languageId], references: [languageId], onDelete: NoAction, onUpdate: NoAction, map: "Submission_LanguageId_Language_LanguageId_fk")
 
   @@map("Submission")
 }
@@ -203,6 +205,7 @@ model SubmissionTestcase {
   memoryUsedInKb Int        @default(256) @db.Integer
   problem        Problem    @relation(fields: [problemId], references: [problemId], onDelete: Cascade, map: "SubmissionTestcase_ProblemId_Problem_ProblemId_fk")
   submission     Submission @relation("SubmissionTestcase_SubmissionId_ToSubmission", fields: [submissionId], references: [submissionId], onDelete: Cascade, map: "SubmissionTestcase_SubmissionId_Submission_SubmissionId_fk")
+  testcase       Testcase   @relation(fields: [testcaseId], references: [testCaseId], onDelete: Cascade, map: "SubmissionTestcase_TestcaseId_Testcase_TestCaseId_fk")
 
   @@id([submissionId, testcaseId], map: "SubmissionTestcase_SubmissionId_TestcaseId_pk")
   @@map("SubmissionTestcase")
@@ -220,21 +223,22 @@ model Tag {
 }
 
 model Testcase {
-  testCaseId     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  problemId      String    @db.Uuid
-  inputData      String
-  expectedOutput String
-  isSample       Boolean   @default(false)
-  points         Int       @default(0) @db.SmallInt
-  label          String?   @db.VarChar(50)
-  explanation    Json?     @db.Json
-  createdAt      DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt      DateTime  @default(now()) @db.Timestamp(6)
-  deletedAt      DateTime? @db.Timestamp(6)
-  createdBy      String?   @db.VarChar(100)
-  updatedBy      String?   @db.VarChar(100)
-  deletedBy      String?   @db.VarChar(100)
-  problem        Problem   @relation(fields: [problemId], references: [problemId], onDelete: Cascade, map: "Testcase_ProblemId_Problem_ProblemId_fk")
+  testCaseId          String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  problemId           String               @db.Uuid
+  inputData           String
+  expectedOutput      String
+  isSample            Boolean              @default(false)
+  points              Int                  @default(0) @db.SmallInt
+  label               String?              @db.VarChar(50)
+  explanation         Json?                @db.Json
+  createdAt           DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt           DateTime             @default(now()) @db.Timestamp(6)
+  deletedAt           DateTime?            @db.Timestamp(6)
+  createdBy           String?              @db.VarChar(100)
+  updatedBy           String?              @db.VarChar(100)
+  deletedBy           String?              @db.VarChar(100)
+  problem             Problem              @relation(fields: [problemId], references: [problemId], onDelete: Cascade, map: "Testcase_ProblemId_Problem_ProblemId_fk")
+  submissionTestcases SubmissionTestcase[]
 
   @@map("Testcase")
 }

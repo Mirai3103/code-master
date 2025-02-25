@@ -11,6 +11,9 @@ import { CodeEditorPanel } from "./_components/CodeEditorPanel";
 import { TestResultPanel } from "./_components/TestResultPanel";
 import { useEditor } from "./_hooks/useEditor";
 import { useTestcases } from "./_hooks/useTestcases";
+import { useProblemEditorContext } from "./context";
+import { trpc } from "@/trpc/react";
+import { RunCodeInput } from "@/server/schema/submission.dto";
 
 export default function EditorSide({
   problem,
@@ -38,9 +41,26 @@ export default function EditorSide({
     });
 
   // Handle submit code - can be extended for actual submission
+  const { setIsShowSubmitTab, setSubmissionId } = useProblemEditorContext();
+  const { mutateAsync: submitCodeAsync } =
+    trpc.submissions.runCode.iterable.useMutation();
+  const utils = trpc.useUtils();
   const handleSubmitCode = () => {
     // Implement submission logic or integration with your API
-    console.log("Submit code", getCurrentCode());
+    const payload: RunCodeInput = {
+      code: getCurrentCode(),
+      isTest: false,
+      languageId: getSelectedLanguageObject()!.languageId!,
+      problemId: problem.problemId,
+      userId: "1",
+    };
+    submitCodeAsync(payload).then(async (asyncGen) => {
+      setIsShowSubmitTab(true);
+      for await (const result of asyncGen) {
+        setSubmissionId(result.submissionId);
+        utils.submissions.getSubmissionById.invalidate(result.submissionId);
+      }
+    });
   };
 
   return (

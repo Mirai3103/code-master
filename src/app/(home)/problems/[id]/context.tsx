@@ -1,24 +1,19 @@
-import {
-  SubmissionStatus,
-  SubmissionTestcaseStatus,
-} from "@/server/schema/enum";
+import { SubmissionTestcaseStatus } from "@/server/schema/enum";
 import { TestCase } from "@/server/schema/testcase.schema";
+import { Submission, SubmissionTestcase } from "@prisma-generated/zod";
 import React, { createContext, useContext } from "react";
 export type SubmittingTestcase = TestCase & {
   status: SubmissionTestcaseStatus;
   actualOutput?: string;
 };
+export type SubmissionDetail = Submission & { testcases: SubmissionTestcase[] };
 interface ProblemEditorContextValue {
   isShowSubmitTab: boolean;
   setIsShowSubmitTab: (value: boolean) => void;
-  testcases: SubmittingTestcase[];
-  setTestcases: React.Dispatch<React.SetStateAction<SubmittingTestcase[]>>;
-  submissionStatus: SubmissionStatus;
-  setSubmissionStatus: (value: SubmissionStatus) => void;
-  tabValue: string;
-  setTabValue: (value: string) => void;
   submissionId: string;
   setSubmissionId: (value: string) => void;
+  tabValue: string;
+  setTabValue: (value: string) => void;
 }
 
 const ProblemEditorContext = createContext<

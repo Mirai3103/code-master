@@ -5,7 +5,7 @@ import { type ClientReadableStream } from "@grpc/grpc-js";
 import { z } from "zod";
 function waitRandomTime() {
   return new Promise((resolve) => {
-    setTimeout(resolve, Math.random() * 1000);
+    setTimeout(resolve, Math.random() * 2000);
   });
 }
 export const submissionRouter = createTRPCRouter({
@@ -21,8 +21,10 @@ export const submissionRouter = createTRPCRouter({
         await submission.testRunCode(input);
       let submissionId = "";
       for await (const response of readableStream) {
+        await waitRandomTime();
         const result = response as SubmissionResult;
-        if (!input.isTest) await submission.addSubmissionTestcaseResult(result);
+        if (!input.isTest)
+          await submission.updateSubmissionTestcaseResult(result);
         if (submissionId === "") {
           submissionId = result.submission_id;
         }
@@ -63,4 +65,10 @@ export const submissionRouter = createTRPCRouter({
   }) {
     return await services.submission.getSubmissionById(input);
   }),
+
+  getBriefSubmissionById: publicProcedure
+    .input(z.string())
+    .query(async function ({ input, ctx: { services } }) {
+      return await services.submission.getBriefSubmissionById(input);
+    }),
 });

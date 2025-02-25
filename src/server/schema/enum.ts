@@ -34,8 +34,8 @@ export enum SubmissionTestcaseStatus {
   WrongAnswer = "Wrong Answer",
   TimeLimitExceeded = "Time Limit Exceeded",
   MemoryLimitExceeded = "Memory Limit Exceeded",
-  RUNNING = "Running",
-  NONE = "None",
+  RUNNING = "Running", // đang chạy testcase
+  NONE = "None", // chưa chạy testcase
 }
 
 export function mapToSubmissionStatus(sts: SubmissionTestcaseStatus[]) {

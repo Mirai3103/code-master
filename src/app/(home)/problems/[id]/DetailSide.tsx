@@ -12,6 +12,7 @@ import {
   LuTag as Tag,
   LuZap as Zap,
   LuActivity as Activity,
+  LuHistory,
 } from "react-icons/lu";
 import { ResizablePanel } from "@/app/_components/ui/resizable";
 import { Problem } from "@prisma/client";
@@ -22,6 +23,7 @@ import { generateHTML } from "@tiptap/core";
 import { StarterKit } from "novel";
 import { Tag as ITag } from "@/server/schema/tag.schema";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
+import SubmissionProgressTab from "./_components/SubmissionTab";
 interface Props {
   problem: Problem & {
     problemTags: Partial<ITag & { tag: { tagName: string } }>[];
@@ -81,13 +83,17 @@ export default function DetailSide({ problem }: Props) {
                 <Zap className="mr-2 h-4 w-4" />
                 Gợi ý
               </TabsTrigger>
-              <TabsTrigger value="submissions" className="flex-1">
-                <Activity className="mr-2 h-4 w-4" />
-                Nộp bài
+              <TabsTrigger value="history" className="flex-1">
+                <LuHistory className="mr-2 h-4 w-4" />
+                Lịch sử bài nộp
               </TabsTrigger>
               <TabsTrigger value="discussions" className="flex-1">
                 <Message className="mr-2 h-4 w-4" />
                 Thảo luận
+              </TabsTrigger>
+              <TabsTrigger value="submission" className="flex-1">
+                <Activity className="mr-2 h-4 w-4" />
+                Bài nộp
               </TabsTrigger>
             </TabsList>
 
@@ -115,7 +121,9 @@ export default function DetailSide({ problem }: Props) {
                 </div>
               </div>
             </TabsContent>
-
+            <TabsContent value="submission">
+              <SubmissionProgressTab />
+            </TabsContent>
             <TabsContent value="hints">
               <Card className="p-4">
                 <h3 className="mb-4 text-lg font-semibold">Gợi ý giải bài</h3>
