@@ -187,4 +187,37 @@ export class TestcaseService {
     });
     return result.count;
   }
+  async reorderByProblemId(problemId: string) {
+    const testcases = await this.prisma.testcase.findMany({
+      where: {
+        problemId: problemId,
+      },
+      select: {
+        createdAt: true,
+        isSample: true,
+        testCaseId: true,
+      },
+    });
+    // isSample: true -> xếp trước, cùng loại thì xếp theo thời gian cũ nhất xếp trước
+    testcases.sort((a, b) => {
+      if (a.isSample && !b.isSample) {
+        return -1;
+      }
+      if (!a.isSample && b.isSample) {
+        return 1;
+      }
+      return a.createdAt.getTime() - b.createdAt.getTime();
+    });
+
+    const updatePromises = testcases.map((testcase, index) =>
+      this.prisma.testcase.update({
+        where: { testCaseId: testcase.testCaseId },
+        data: {
+          index: index + 1,
+        },
+      }),
+    );
+
+    await Promise.all(updatePromises);
+  }
 }
