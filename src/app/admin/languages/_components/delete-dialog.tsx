@@ -1,5 +1,5 @@
 import { TbAlertTriangle as IconAlertTriangle } from "react-icons/tb";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { trpc } from "@/trpc/react";
 import { type Language } from "@/server/schema/language.schema";
@@ -21,9 +21,7 @@ export function LanguagesDeleteDialog({
     onOpenChange(false);
     await mutateAsync(currentRow.languageId);
     utils.languages.getLanguages.invalidate();
-    toast({
-      title: `Thẻ ${currentRow.languageName} đã được xóa`,
-    });
+    toast.success(`Thẻ ${currentRow.languageName} đã được xóa`);
   };
 
   return (

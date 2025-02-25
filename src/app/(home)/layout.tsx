@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { cn } from "../_lib/utils";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 const NAVIGATION = [
   { name: "Trang Chủ", icon: LuHome, href: "/problems", current: true },
   { name: "Khóa Học", icon: Book, href: "/courses", current: false },
@@ -48,18 +49,20 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
   const isExceptPath = React.useMemo(() => {
     return EXCEPT_PATHS.some((path) => path.test(pathname));
   }, [pathname]);
-  console.log("pathname", pathname, "isExceptPath", isExceptPath);
+  const { data: session } = useSession();
 
   const UserAvatar = () => (
     <div className="flex items-center gap-2">
       <img
         className="h-8 w-8 rounded-full"
-        src="https://placewaifu.com/image/200/200"
+        src={session?.user.image || "https://placewaifu.com/image/200/200"}
         alt="User avatar"
       />
       <div className="hidden md:block">
-        <div className="text-sm font-medium text-gray-900">Trần Văn A</div>
-        <div className="text-xs text-gray-500">200 Points</div>
+        <div className="text-sm font-medium text-gray-900">
+          {session?.user?.name}
+        </div>
+        {/* <div className="text-xs text-gray-500">200 Points</div> */}
       </div>
     </div>
   );

@@ -44,8 +44,9 @@ const LandingPage = () => {
             <Button
               variant="outline"
               className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+              asChild
             >
-              Đăng Nhập
+              <Link href="/auth">Đăng Nhập</Link>
             </Button>
           </div>
         </nav>

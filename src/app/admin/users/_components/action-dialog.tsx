@@ -1,6 +1,6 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -62,16 +62,11 @@ export function UsersEditPermissionDialog({
     try {
       await mutateAsync(values);
       utils.users.getUsers.invalidate();
-      toast({
-        title: "Người dùng đã được cập nhật",
-      });
+      toast.success("Người dùng đã được cập nhật");
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      toast({
-        title: "Có lỗi xảy ra",
-        description: (error as any)?.message || "Vui lòng thử lại sau",
-      });
+      toast.success((error as any)?.message || "Vui lòng thử lại sau");
     }
   };
   return (

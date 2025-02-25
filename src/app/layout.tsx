@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { Toaster } from "@/components/ui/toaster";
 import NextTopLoader from "nextjs-toploader";
 
 import Providers from "./session-provider";
 import { TRPCReactProvider } from "@/trpc/react";
 import { auth } from "@/server/auth";
+import { Toaster } from "sonner";
 const spaceGrotesk = Space_Grotesk({
   display: "auto",
   subsets: ["vietnamese"],

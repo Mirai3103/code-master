@@ -25,7 +25,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type JSONContent } from "novel";
 import { trpc } from "@/trpc/react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 import { SelectTagInput } from "../_components/select-tag-input";
 import {
@@ -84,9 +84,7 @@ export default function CreateForm({
       onSuccess: () => {
         utils.problems.getProblems.invalidate();
         push("/admin/problems");
-        toast({
-          title: "Bài toán đã được thêm thành công",
-        });
+        toast.success("Bài toán đã được thêm thành công");
       },
     });
   const { mutateAsync: updateProblem } =
@@ -94,9 +92,7 @@ export default function CreateForm({
       onSuccess: () => {
         utils.problems.getProblems.invalidate();
         push("/admin/problems");
-        toast({
-          title: "Bài toán đã được cập nhật thành công",
-        });
+        toast.success("Bài toán đã được cập nhật thành công");
       },
     });
   console.log("form", form.formState.errors);
@@ -125,10 +121,7 @@ export default function CreateForm({
       await createProblem(payload);
     } catch (error) {
       console.error(error);
-      toast({
-        title: "Có lỗi xảy ra",
-        variant: "destructive",
-      });
+      toast.success("Có lỗi xảy ra");
     }
   };
   return (

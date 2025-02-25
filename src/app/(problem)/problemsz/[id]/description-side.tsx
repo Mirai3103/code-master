@@ -9,7 +9,7 @@ import { type ProblemDetail } from "./type";
 import { Badge } from "@/components/ui/badge";
 import { useIsClient } from "usehooks-ts";
 import { trpc } from "@/trpc/react";
-import { useProblemEditorContext } from "./context";
+import { useProblemEditorContext } from "../../../(home)/problems/[id]/context";
 import { Progress } from "@/components/ui/progress";
 import {
   SubmissionStatus,

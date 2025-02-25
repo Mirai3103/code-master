@@ -13,22 +13,30 @@ import {
   LuEye as Eye,
   LuEyeOff as EyeOff,
 } from "react-icons/lu";
-
+import { redirect } from "next/navigation";
 import { FcGoogle as Google } from "react-icons/fc";
+import { useSearchParams } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 
 const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    // Giả lập loading
-    setTimeout(() => setLoading(false), 1500);
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
+  const { data: session } = useSession();
+  if (session) {
+    redirect(redirectTo || "/problems");
+  }
+  const handleLogin = (
+    provider: "google" | "facebook" | "discord" | "github",
+  ) => {
+    signIn(provider, {
+      callbackUrl: redirectTo || "/problems",
+    });
   };
-
   return (
-    <div className="min-h-content-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white px-4 py-4">
+    <div className="flex min-h-content-screen items-center justify-center bg-gradient-to-b from-blue-50 to-white px-4 py-4">
       <div className="w-full max-w-[440px]">
         {/* Logo */}
         <div className="mb-8 text-center">
@@ -55,7 +63,7 @@ const AuthPage = () => {
             <CardContent className="p-6">
               {/* Login Form */}
               <TabsContent value="login">
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Email
@@ -124,11 +132,19 @@ const AuthPage = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <Button variant="outline" className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => handleLogin("github")}
+                  >
                     <Github className="mr-2 h-4 w-4" />
                     Github
                   </Button>
-                  <Button variant="outline" className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => handleLogin("google")}
+                  >
                     <Google className="mr-2 h-4 w-4" />
                     Google
                   </Button>
@@ -137,7 +153,7 @@ const AuthPage = () => {
 
               {/* Register Form */}
               <TabsContent value="register">
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       Họ và tên

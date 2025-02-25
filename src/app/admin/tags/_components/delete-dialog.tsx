@@ -1,5 +1,5 @@
 import { TbAlertTriangle as IconAlertTriangle } from "react-icons/tb";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { type Tag } from "@/server/schema/tag.schema";
 import { trpc } from "@/trpc/react";
@@ -17,9 +17,7 @@ export function TagsDeleteDialog({ open, onOpenChange, currentRow }: Props) {
     onOpenChange(false);
     await mutateAsync(currentRow.tagId);
     utils.tags.getTags.invalidate();
-    toast({
-      title: `Thẻ ${currentRow.tagName} đã được xóa`,
-    });
+    toast.success(`Thẻ ${currentRow.tagName} đã được xóa`);
   };
 
   return (

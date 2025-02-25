@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Editor, useMonaco } from "@monaco-editor/react";
 import {
@@ -72,9 +72,9 @@ export function LanguagesActionDialog({
       await createLanguageAsync(values);
     }
     utils.languages.getLanguages.invalidate();
-    toast({
-      title: isEdit ? "Ngôn ngữ đã được cập nhật" : "Ngôn ngữ đã được tạo",
-    });
+    toast.success(
+      isEdit ? "Ngôn ngữ đã được cập nhật" : "Ngôn ngữ đã được tạo",
+    );
     onOpenChange(false);
   };
 

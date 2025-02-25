@@ -6,12 +6,14 @@ interface CodeDisplayProps {
   content: string;
   maxHeight?: string;
   className?: string;
+  isError?: boolean;
 }
 
 export function CodeDisplay({
   content,
   maxHeight = "300px",
   className,
+  isError = false,
 }: CodeDisplayProps) {
   const [copied, setCopied] = useState(false);
 
@@ -27,7 +29,12 @@ export function CodeDisplay({
 
   return (
     <div
-      className={cn("relative my-1 rounded-md border bg-gray-50", className)}
+      className={cn(
+        "relative my-1 rounded-md border",
+        className,
+
+        isError ? "border-red-200 bg-red-50" : "bg-gray-50",
+      )}
     >
       <pre
         className={`long-code-block relative overflow-auto whitespace-pre p-2 font-mono text-sm text-gray-800`}

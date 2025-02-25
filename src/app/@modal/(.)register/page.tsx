@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ExternalLogin from "../external-login";
@@ -60,10 +60,7 @@ export default function RegisterModal() {
     // Giả lập gọi API
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    toast({
-      title: "Đăng ký thành công!",
-      description: "Tài khoản của bạn đã được tạo.",
-    });
+    toast.success("Đăng ký thành công!");
     console.log(data);
     back();
   }

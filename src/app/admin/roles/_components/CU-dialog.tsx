@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -68,9 +68,7 @@ export function RolesActionDialog({ currentRow, open, onOpenChange }: Props) {
       await createRoleAsync(values);
     }
     utils.roles.getRoles.invalidate();
-    toast({
-      title: isEdit ? "Vai trò đã được cập nhật" : "Vai trò đã được tạo",
-    });
+    toast.success(isEdit ? "Vai trò đã được cập nhật" : "Vai trò đã được tạo");
     onOpenChange(false);
   };
   return (

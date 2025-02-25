@@ -15,7 +15,7 @@ import { LuSaveAll as SaveAll } from "react-icons/lu";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import _ from "lodash";
 import { trpc } from "@/trpc/react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { type Problem } from "@/server/schema/problem.schema";
 // Language[];
 
@@ -102,10 +102,7 @@ function Actions({
     await mutateAsync(payload);
     setOpen(false);
     table.resetRowSelection();
-    toast({
-      title: "Thành công",
-      description: "Cập nhật danh sách ngôn ngữ lập trình thành công",
-    });
+    toast.success("Cập nhật danh sách ngôn ngữ lập trình thành công");
     setTimeout(() => {
       refresh();
     }, 500);

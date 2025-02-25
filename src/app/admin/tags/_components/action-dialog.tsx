@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -67,9 +67,7 @@ export function TagsActionDialog({ currentRow, open, onOpenChange }: Props) {
       await createTagAsync(values);
     }
     utils.tags.getTags.invalidate();
-    toast({
-      title: isEdit ? "Thẻ đã được cập nhật" : "Thẻ đã được tạo",
-    });
+    toast.success(isEdit ? "Thẻ đã được cập nhật" : "Thẻ đã được tạo");
     onOpenChange(false);
   };
   return (

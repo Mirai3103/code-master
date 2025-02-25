@@ -1,13 +1,10 @@
 "use client";
 
 import React from "react";
-import {
-  ProblemEditorProvider,
-  SubmittingTestcase,
-} from "../../../(home)/problems/[id]/context";
+import { ProblemEditorProvider, SubmittingTestcase } from "./context";
 import { SubmissionStatus } from "@/server/schema/enum";
 
-export default function MainLayout({
+export default function DetailLayout({
   children,
 }: {
   children: React.ReactNode;

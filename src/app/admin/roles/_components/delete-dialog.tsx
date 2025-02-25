@@ -1,5 +1,5 @@
 import { TbAlertTriangle as IconAlertTriangle } from "react-icons/tb";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { type Role } from "@/server/schema/role";
 import { trpc } from "@/trpc/react";
@@ -17,9 +17,7 @@ export function RolesDeleteDialog({ open, onOpenChange, currentRow }: Props) {
     onOpenChange(false);
     await mutateAsync({ roleId: currentRow.roleId });
     utils.roles.getRoles.invalidate();
-    toast({
-      title: `Vai trò ${currentRow.roleName} đã được xóa`,
-    });
+    toast.success(`Vai trò ${currentRow.roleName} đã được xóa`);
   };
 
   return (

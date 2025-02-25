@@ -4,7 +4,6 @@ import {
 } from "@/server/schema/enum";
 import { TestCase } from "@/server/schema/testcase.schema";
 import React, { createContext, useContext } from "react";
-export type DialogType = "add" | "edit" | "delete";
 export type SubmittingTestcase = TestCase & {
   status: SubmissionTestcaseStatus;
   actualOutput?: string;

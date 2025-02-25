@@ -28,7 +28,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { trpc } from "@/trpc/react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -104,9 +104,7 @@ export default function TestcaseForm({ problem_id, type, testcase }: Props) {
       await createTestcaseAsync(payload);
     }
     utils.tags.getTags.invalidate();
-    toast({
-      title: isEdit ? "Testcase đã được cập nhật" : "Testcase đã được tạo",
-    });
+    toast(isEdit ? "Testcase đã được cập nhật" : "Testcase đã được tạo");
     // onOpenChange(false);
     back();
     setTimeout(() => {

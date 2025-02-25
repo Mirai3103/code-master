@@ -23,7 +23,7 @@ import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { trpc } from "@/trpc/react";
 import RuleActionForm from "../../_components/RuleActionForm";
-import { toast } from "@/app/_hooks/use-toast";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 interface IProp {
@@ -62,19 +62,11 @@ export default function EditForm({ role }: IProp) {
     console.log("Form data:", data);
     mutateAsync(data)
       .then((data) => {
-        toast({
-          duration: 3000,
-          title: "Thành công",
-          description: "Vai trò đã được cập nhật thành công",
-        });
+        toast.success("Vai trò đã được cập nhật thành công");
         router.push("/admin/roles");
       })
       .catch((err) => {
-        toast({
-          duration: 3000,
-          title: "Thất bại",
-          description: "Đã có lỗi xảy ra",
-        });
+        toast.success("Đã có lỗi xảy ra");
       });
   };
   console.log(form.formState.errors, role);

@@ -23,8 +23,9 @@ import TextAlign from "@tiptap/extension-text-align";
 import TextStyle from "@tiptap/extension-text-style";
 import Typography from "@tiptap/extension-typography";
 import { PrismaClient, Problem, ProblemTag, Tag } from "@prisma/client";
-const prisma = new PrismaClient();
+import { readFileSync } from "fs";
 
+const prisma = new PrismaClient();
 const queue = new PQueue({ concurrency: 1 });
 
 export interface ProblemsResponse {
@@ -62,11 +63,41 @@ const difficulties = {
 
 export interface TopicTag {
   name: string;
-  id: string;
+  id?: string;
   slug: string;
+  translatedName?: null;
 }
+
+export interface ProblemDetail {
+  link: string;
+  questionId: string;
+  questionFrontendId: string;
+  questionTitle: string;
+  titleSlug: string;
+  difficulty: string;
+  isPaidOnly: boolean;
+  question: string;
+  exampleTestcases: string;
+  topicTags: TopicTag[];
+  hints: string[];
+  solution: Solution;
+  companyTagStats: null;
+  likes: number;
+  dislikes: number;
+  similarQuestions: string;
+}
+
+export interface Solution {
+  id: string;
+  canSeeDetail: boolean;
+  paidOnly: boolean;
+  hasVideoSolution: boolean;
+  paidOnlyVideo: boolean;
+}
+
 const mutex = new Mutex();
-async function saveTags(tags: TopicTag[]) {
+
+async function saveTags(tags: TopicTag[]): Promise<Tag[]> {
   const newTags: Tag[] = tags.map((tag) => {
     return {
       tagId: uuidv4(),
@@ -76,26 +107,30 @@ async function saveTags(tags: TopicTag[]) {
       description: null,
     };
   });
+
   const release = await mutex.acquire();
   try {
-    newTags.map(async (newTag) => {
-      const exist = await prisma.tag.findFirst({
-        where: { tagName: newTag.tagName },
-      });
-      if (!exist) {
-        await prisma.tag.create({
-          data: {
-            tagId: newTag.tagId,
-            tagName: newTag.tagName,
-            createdAt: newTag.createdAt,
-            description: newTag.description,
-            createdBy: newTag.createdBy,
-          },
+    // Use Promise.all to wait for all async operations to complete
+    await Promise.all(
+      newTags.map(async (newTag) => {
+        const exist = await prisma.tag.findFirst({
+          where: { tagName: newTag.tagName },
         });
-      } else {
-        newTag.tagId = exist.tagId;
-      }
-    });
+        if (!exist) {
+          await prisma.tag.create({
+            data: {
+              tagId: newTag.tagId,
+              tagName: newTag.tagName,
+              createdAt: newTag.createdAt,
+              description: newTag.description,
+              createdBy: newTag.createdBy,
+            },
+          });
+        } else {
+          newTag.tagId = exist.tagId;
+        }
+      }),
+    );
   } finally {
     release();
   }
@@ -125,96 +160,115 @@ const extensions = [
   Typography,
 ];
 
-async function sleep(ms: number) {
+async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function getProblemsDetail(
   briefProblem: ProblemsetQuestionList,
 ): Promise<Partial<Problem>> {
-  await sleep(1000);
-  const response = await axios.get<ProblemDetail>(
-    `https://alfa-leetcode-api.onrender.com/select?titleSlug=${briefProblem.titleSlug}`,
-  );
+  try {
+    await sleep(1000);
+    const response = await axios.get<ProblemDetail>(
+      `https://alfa-leetcode-api.onrender.com/select?titleSlug=${briefProblem.titleSlug}`,
+    );
 
-  const rest = {
-    title: response.data.questionTitle,
-    createdAt: new Date(),
-    difficultyLevel: difficulties[briefProblem.difficulty],
-    problemStatement: generateJSON(response.data.question, extensions),
-    description: generateJSON(
-      response.data.hints.map((hint) => `<p>${hint}</p>`).join(""),
-      extensions,
-    ),
-  };
-  const exitsTitle = await prisma.problem.findFirst({
-    where: { title: rest.title },
-  });
-  if (exitsTitle) {
-    return rest;
-  }
-  const tags = await saveTags(response.data.topicTags);
-
-  const newProb = await prisma.problem.create({
-    data: rest,
-  });
-  const problemTags: ProblemTag[] = tags.map((tag) => {
-    return {
-      problemId: newProb.problemId,
-      tagId: tag.tagId,
+    const rest = {
+      title: response.data.questionTitle,
+      createdAt: new Date(),
+      difficultyLevel: difficulties[briefProblem.difficulty],
+      problemStatement: generateJSON(response.data.question, extensions),
+      description: generateJSON(
+        response.data.hints.map((hint) => `<p>${hint}</p>`).join(""),
+        extensions,
+      ),
     };
-  });
-  await prisma.problemTag.createMany({
-    data: problemTags,
-    skipDuplicates: true,
-  });
-  return rest;
+
+    const exitsTitle = await prisma.problem.findFirst({
+      where: { title: rest.title },
+    });
+
+    if (exitsTitle) {
+      return rest;
+    }
+
+    const tags = await saveTags(response.data.topicTags);
+
+    const newProb = await prisma.problem.create({
+      data: rest,
+    });
+
+    const problemTags: ProblemTag[] = tags.map((tag) => {
+      return {
+        problemId: newProb.problemId,
+        tagId: tag.tagId,
+      };
+    });
+
+    await prisma.problemTag.createMany({
+      data: problemTags,
+      skipDuplicates: true,
+    });
+
+    const availableLanguages = await prisma.language.findMany();
+    prisma.problemLanguage.createMany({
+      data: availableLanguages.map((language) => ({
+        languageId: language.languageId,
+        problemId: newProb.problemId,
+      })),
+    });
+
+    return rest;
+  } catch (error) {
+    console.error(`Error fetching problem ${briefProblem.titleSlug}:`, error);
+    throw error;
+  }
 }
 
 async function main() {
-  const response = await axios.get<ProblemsResponse>(
-    "https://alfa-leetcode-api.onrender.com/problems?skip=40&limit=100",
-  );
+  try {
+    // Uncomment to fetch from API instead of using local file
+    // const response = await axios.get<ProblemsResponse>(
+    //   "https://alfa-leetcode-api.onrender.com/problems?skip=40&limit=100",
+    // );
+    // const briefProblems = response.data.problemsetQuestionList;
 
-  const briefProblems = response.data.problemsetQuestionList;
-  for await (const briefProblem of briefProblems) {
-    queue.add(() => getProblemsDetail(briefProblem));
+    // Use a relative path or environment variable for the file path
+    const filePath =
+      process.env.PROBLEMS_JSON_PATH ||
+      "C:/Users/BaoBao/Downloads/problems.json";
+    console.log(`Reading problems from ${filePath}`);
+
+    const problemsData = JSON.parse(
+      readFileSync(filePath, "utf-8"),
+    ) as ProblemsResponse;
+
+    const briefProblems = problemsData.problemsetQuestionList;
+
+    // Add items to queue with proper error handling
+    for (const briefProblem of briefProblems) {
+      queue.add(() =>
+        getProblemsDetail(briefProblem).catch((err) => {
+          console.error(
+            `Failed to process problem ${briefProblem.titleSlug}:`,
+            err,
+          );
+        }),
+      );
+    }
+
+    await queue.onIdle();
+    console.log("All problems processed successfully");
+  } catch (error) {
+    console.error("Error in main function:", error);
+  } finally {
+    await prisma.$disconnect();
   }
-  await queue.onIdle();
 }
+
 main()
   .then(() => console.log("Done"))
-  .catch(console.error);
-
-export interface ProblemDetail {
-  link: string;
-  questionId: string;
-  questionFrontendId: string;
-  questionTitle: string;
-  titleSlug: string;
-  difficulty: string;
-  isPaidOnly: boolean;
-  question: string;
-  exampleTestcases: string;
-  topicTags: TopicTag[];
-  hints: string[];
-  solution: Solution;
-  companyTagStats: null;
-  likes: number;
-  dislikes: number;
-  similarQuestions: string;
-}
-
-export interface Solution {
-  id: string;
-  canSeeDetail: boolean;
-  paidOnly: boolean;
-  hasVideoSolution: boolean;
-  paidOnlyVideo: boolean;
-}
-
-export interface TopicTag {
-  name: string;
-  slug: string;
-  translatedName: null;
-}
+  .catch((error) => {
+    console.error("Fatal error:", error);
+    process.exit(1);
+  });

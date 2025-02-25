@@ -29,8 +29,8 @@ import {
   SubmissionTestcaseStatus,
 } from "@/server/schema/enum";
 import { useSession } from "next-auth/react";
-import { toast } from "@/app/_hooks/use-toast";
-import { useProblemEditorContext } from "./context";
+import { toast } from "sonner";
+import { useProblemEditorContext } from "../../../(home)/problems/[id]/context";
 interface Props {
   languages: LanguageOfProblem[];
   problemId: string;
@@ -100,15 +100,10 @@ export default function EditorSide({ languages, problemId }: Props) {
     })
       .then((submissionId) => {
         console.log("Save draft success", submissionId);
-        toast({
-          title: "Lưu nháp thành công",
-        });
+        toast.success("Lưu nháp thành công");
       })
       .catch((error) => {
-        toast({
-          title: "Lưu nháp thất bại",
-          description: error.message,
-        });
+        toast.error("Lưu nháp thất bại");
       });
   }, [editorRef, language, languages, problemId, saveDraft]);
 

@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
@@ -48,10 +48,7 @@ export default function LoginModal() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     setIsLoading(false);
-    toast({
-      title: "Đăng nhập thành công!",
-      description: "Chào mừng bạn quay trở lại.",
-    });
+    toast.success("Đăng nhập thành công!");
     console.log(data);
   }
   return (

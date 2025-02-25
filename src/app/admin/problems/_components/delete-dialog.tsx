@@ -1,5 +1,5 @@
 import { TbAlertTriangle as IconAlertTriangle } from "react-icons/tb";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { trpc } from "@/trpc/react";
 import { type Problem } from "@/server/schema/problem.schema";
@@ -21,9 +21,7 @@ export function ProblemsDeleteDialog({
     onOpenChange(false);
     await mutateAsync(currentRow.problemId);
     utils.problems.getProblems.invalidate();
-    toast({
-      title: `Thẻ ${currentRow.title} đã được xóa`,
-    });
+    toast.success(`Thẻ ${currentRow.title} đã được xóa`);
   };
 
   return (

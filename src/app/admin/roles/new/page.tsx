@@ -23,7 +23,7 @@ import { Header } from "@/components/layout/header";
 import { trpc } from "@/trpc/react";
 import RuleActionForm from "../../_components/RuleActionForm";
 import { nanoid } from "nanoid";
-import { toast } from "@/app/_hooks/use-toast";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 // Zod Schemas
@@ -57,19 +57,10 @@ const RoleManagement = () => {
     console.log("Form data:", data);
     mutateAsync(data)
       .then((data) => {
-        toast({
-          duration: 3000,
-          title: "Thành công",
-          description: "Vai trò đã được tạo thành công",
-        });
-        router.push("/admin/roles");
+        toast.success("Vai trò đã được tạo thành công");
       })
       .catch((err) => {
-        toast({
-          duration: 3000,
-          title: "Thất bại",
-          description: "Đã có lỗi xảy ra",
-        });
+        toast.success("Đã có lỗi xảy ra");
       })
       .finally(() => {
         utils.roles.getRoles.invalidate();
