@@ -71,4 +71,13 @@ export const submissionRouter = createTRPCRouter({
     .query(async function ({ input, ctx: { services } }) {
       return await services.submission.getBriefSubmissionById(input);
     }),
+
+  getSubmissionsHistory: publicProcedure
+    .input(z.object({ problemId: z.string(), userId: z.string() }))
+    .query(async function ({ input, ctx: { services } }) {
+      return await services.submission.getSubmissionsHistory(
+        input.problemId,
+        input.userId,
+      );
+    }),
 });

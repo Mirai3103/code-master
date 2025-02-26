@@ -1,4 +1,6 @@
 import z from "zod";
+import { Language } from "./language.schema";
+import { SubmissionStatus } from "./enum";
 
 export const runCodeInput = z.object({
   code: z.string().min(1),
@@ -11,17 +13,6 @@ export const runCodeInput = z.object({
 export type RunCodeInput = z.infer<typeof runCodeInput>;
 
 // Enum cho trạng thái submission
-export enum SubmissionStatus {
-  PENDING = "PENDING",
-  COMPILING = "COMPILING",
-  RUNNING = "RUNNING",
-  ACCEPTED = "ACCEPTED",
-  WRONG_ANSWER = "WRONG_ANSWER",
-  TIME_LIMIT_EXCEEDED = "TIME_LIMIT_EXCEEDED",
-  MEMORY_LIMIT_EXCEEDED = "MEMORY_LIMIT_EXCEEDED",
-  COMPILATION_ERROR = "COMPILATION_ERROR",
-  RUNTIME_ERROR = "RUNTIME_ERROR",
-}
 
 // Base schema cho các trường chung
 const submissionBaseSchema = z.object({
@@ -99,6 +90,7 @@ export type Submission = {
   userId: string;
   problemId: string;
   languageId: number;
+  language?: Language;
   code: string;
   status: SubmissionStatus;
   timeExecution: number;
