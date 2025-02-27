@@ -42,7 +42,7 @@ export function CodeDisplay({
       >
         <button
           onClick={handleCopy}
-          className="absolute right-0 top-0 flex items-center gap-1 rounded-md p-1 text-xs text-gray-500 hover:bg-gray-200 focus:outline-none"
+          className="absolute right-0 top-0 flex items-center gap-1 rounded-md p-1 text-xs text-gray-500 hover:bg-gray-200 focus:outline-hidden"
           aria-label="Copy to clipboard"
         >
           {copied ? (

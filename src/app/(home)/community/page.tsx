@@ -118,7 +118,7 @@ const CommunityPage = () => {
           alt="Community Banner"
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-purple-900/80" />
+        <div className="absolute inset-0 bg-linear-to-r from-blue-900/90 to-purple-900/80" />
         <div className="absolute inset-0 flex items-center justify-center text-white">
           <div className="text-center">
             <h1 className="mb-4 text-4xl font-bold">Cộng Đồng CodePro</h1>
@@ -188,7 +188,7 @@ const CommunityPage = () => {
               >
                 <div className="flex items-start gap-4">
                   {/* Author Info */}
-                  <div className="flex-shrink-0 text-center">
+                  <div className="shrink-0 text-center">
                     <img
                       src={post.author.avatar}
                       alt={post.author.name}
@@ -365,7 +365,7 @@ const CommunityPage = () => {
                       alt={`Topic ${index + 1}`}
                       className="h-full w-full object-cover transition-transform group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-2 left-2 text-white">
                       <div className="font-medium">Dynamic Programming</div>
                       <div className="flex items-center gap-2 text-sm">
@@ -417,7 +417,7 @@ const CommunityPage = () => {
           </Card>
 
           {/* Community Guidelines */}
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+          <Card className="bg-linear-to-br from-blue-50 to-indigo-50 p-6">
             <h3 className="mb-4 flex items-center text-lg font-semibold">
               <LuShield className="mr-2 h-5 w-5 text-blue-500" />
               Nguyên tắc cộng đồng

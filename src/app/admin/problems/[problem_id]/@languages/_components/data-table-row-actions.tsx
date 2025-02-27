@@ -41,7 +41,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => {}} className="!text-red-500">
+          <DropdownMenuItem onClick={() => {}} className="text-red-500!">
             Xóa language
             <DropdownMenuShortcut>
               <IconTrash size={16} />

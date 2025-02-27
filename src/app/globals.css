@@ -1,6 +1,104 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/typography';
+@plugin 'tailwindcss-animate';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --width-max-w-8xl: 90rem;
+
+  --height-header: 4rem;
+  --height-content-screen: calc(100vh - 4rem - 3px);
+
+  --min-height-content-screen: calc(100vh - 4rem - 10px);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -81,280 +179,282 @@
   }
 }
 
-.ProseMirror {
-  @apply prose-sm max-w-none rounded-md border border-input px-3 py-1 shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring;
-}
-.ProseMirror > ul {
-  @apply my-1 ml-6 list-disc;
-}
-.ProseMirror > ol {
-  @apply my-1 ml-6 list-decimal;
-}
+@layer utilities {
+  .ProseMirror {
+    @apply prose-sm max-w-none rounded-md border border-input px-3 py-1 shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring;
+  }
+  .ProseMirror > ul {
+    @apply my-1 ml-6 list-disc;
+  }
+  .ProseMirror > ol {
+    @apply my-1 ml-6 list-decimal;
+  }
 
-.ProseMirror .is-editor-empty:first-child::before {
-  content: attr(data-placeholder);
-  float: left;
-  color: hsl(var(--muted-foreground));
-  pointer-events: none;
-  height: 0;
-}
-.ProseMirror .is-empty::before {
-  content: attr(data-placeholder);
-  float: left;
-  color: hsl(var(--muted-foreground));
-  pointer-events: none;
-  height: 0;
-}
+  .ProseMirror .is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+    height: 0;
+  }
+  .ProseMirror .is-empty::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+    height: 0;
+  }
 
-/* Custom image styles */
-.ProseMirror img {
-  transition: filter 0.1s ease-in-out;
+  /* Custom image styles */
+  .ProseMirror img {
+    transition: filter 0.1s ease-in-out;
 
-  &:hover {
+    &:hover {
+      cursor: pointer;
+      filter: brightness(90%);
+    }
+
+    &.ProseMirror-selectednode {
+      outline: 3px solid #5abbf7;
+      filter: brightness(90%);
+    }
+  }
+
+  .img-placeholder {
+    position: relative;
+
+    &:before {
+      content: '';
+      box-sizing: border-box;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 3px solid var(--novel-stone-200);
+      border-top-color: var(--novel-stone-800);
+      animation: spinning 0.6s linear infinite;
+    }
+  }
+
+  @keyframes spinning {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Custom TODO list checkboxes – shoutout to this awesome tutorial: https://moderncss.dev/pure-css-custom-checkbox-style/ */
+  ul[data-type='taskList'] li > label {
+    margin-right: 0.2rem;
+    user-select: none;
+  }
+
+  @media screen and (max-width: 768px) {
+    ul[data-type='taskList'] li > label {
+      margin-right: 0.5rem;
+    }
+  }
+
+  ul[data-type='taskList'] li > label input[type='checkbox'] {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: hsl(var(--background));
+    margin: 0;
     cursor: pointer;
-    filter: brightness(90%);
+    width: 1.2em;
+    height: 1.2em;
+    position: relative;
+    top: 5px;
+    border: 2px solid hsl(var(--border));
+    margin-right: 0.3rem;
+    display: grid;
+    place-content: center;
+
+    &:hover {
+      background-color: hsl(var(--accent));
+    }
+
+    &:active {
+      background-color: hsl(var(--accent));
+    }
+
+    &::before {
+      content: '';
+      width: 0.65em;
+      height: 0.65em;
+      transform: scale(0);
+      transition: 120ms transform ease-in-out;
+      box-shadow: inset 1em 1em;
+      transform-origin: center;
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    }
+
+    &:checked::before {
+      transform: scale(1);
+    }
   }
 
-  &.ProseMirror-selectednode {
-    outline: 3px solid #5abbf7;
-    filter: brightness(90%);
-  }
-}
-
-.img-placeholder {
-  position: relative;
-
-  &:before {
-    content: "";
-    box-sizing: border-box;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 3px solid var(--novel-stone-200);
-    border-top-color: var(--novel-stone-800);
-    animation: spinning 0.6s linear infinite;
-  }
-}
-
-@keyframes spinning {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Custom TODO list checkboxes – shoutout to this awesome tutorial: https://moderncss.dev/pure-css-custom-checkbox-style/ */
-ul[data-type="taskList"] li > label {
-  margin-right: 0.2rem;
-  user-select: none;
-}
-
-@media screen and (max-width: 768px) {
-  ul[data-type="taskList"] li > label {
-    margin-right: 0.5rem;
-  }
-}
-
-ul[data-type="taskList"] li > label input[type="checkbox"] {
-  -webkit-appearance: none;
-  appearance: none;
-  background-color: hsl(var(--background));
-  margin: 0;
-  cursor: pointer;
-  width: 1.2em;
-  height: 1.2em;
-  position: relative;
-  top: 5px;
-  border: 2px solid hsl(var(--border));
-  margin-right: 0.3rem;
-  display: grid;
-  place-content: center;
-
-  &:hover {
-    background-color: hsl(var(--accent));
+  ul[data-type='taskList'] li[data-checked='true'] > div > p {
+    color: var(--muted-foreground);
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
   }
 
-  &:active {
-    background-color: hsl(var(--accent));
+  /* Overwrite tippy-box original max-width */
+  .tippy-box {
+    max-width: 400px !important;
   }
 
-  &::before {
-    content: "";
-    width: 0.65em;
-    height: 0.65em;
-    transform: scale(0);
-    transition: 120ms transform ease-in-out;
-    box-shadow: inset 1em 1em;
-    transform-origin: center;
-    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-  }
-
-  &:checked::before {
-    transform: scale(1);
-  }
-}
-
-ul[data-type="taskList"] li[data-checked="true"] > div > p {
-  color: var(--muted-foreground);
-  text-decoration: line-through;
-  text-decoration-thickness: 2px;
-}
-
-/* Overwrite tippy-box original max-width */
-.tippy-box {
-  max-width: 400px !important;
-}
-
-.ProseMirror:not(.dragging) .ProseMirror-selectednode {
-  outline: none !important;
-  background-color: var(--novel-highlight-blue);
-  transition: background-color 0.2s;
-  box-shadow: none;
-}
-
-.drag-handle {
-  position: fixed;
-  opacity: 1;
-  transition: opacity ease-in 0.2s;
-  border-radius: 0.25rem;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' style='fill: rgba(0, 0, 0, 0.5)'%3E%3Cpath d='M3,2 C2.44771525,2 2,1.55228475 2,1 C2,0.44771525 2.44771525,0 3,0 C3.55228475,0 4,0.44771525 4,1 C4,1.55228475 3.55228475,2 3,2 Z M3,6 C2.44771525,6 2,5.55228475 2,5 C2,4.44771525 2.44771525,4 3,4 C3.55228475,4 4,4.44771525 4,5 C4,5.55228475 3.55228475,6 3,6 Z M3,10 C2.44771525,10 2,9.55228475 2,9 C2,8.44771525 2.44771525,8 3,8 C3.55228475,8 4,8.44771525 4,9 C4,9.55228475 3.55228475,10 3,10 Z M7,2 C6.44771525,2 6,1.55228475 6,1 C6,0.44771525 6.44771525,0 7,0 C7.55228475,0 8,0.44771525 8,1 C8,1.55228475 7.55228475,2 7,2 Z M7,6 C6.44771525,6 6,5.55228475 6,5 C6,4.44771525 6.44771525,4 7,4 C7.55228475,4 8,4.44771525 8,5 C8,5.55228475 7.55228475,6 7,6 Z M7,10 C6.44771525,10 6,9.55228475 6,9 C6,8.44771525 6.44771525,8 7,8 C7.55228475,8 8,8.44771525 8,9 C8,9.55228475 7.55228475,10 7,10 Z'%3E%3C/path%3E%3C/svg%3E");
-  background-size: calc(0.5em + 0.375rem) calc(0.5em + 0.375rem);
-  background-repeat: no-repeat;
-  background-position: center;
-  width: 1.2rem;
-  height: 1.5rem;
-  z-index: 50;
-  cursor: grab;
-
-  &:hover {
-    background-color: var(--novel-stone-100);
+  .ProseMirror:not(.dragging) .ProseMirror-selectednode {
+    outline: none !important;
+    background-color: var(--novel-highlight-blue);
     transition: background-color 0.2s;
+    box-shadow: none;
   }
 
-  &:active {
-    background-color: var(--novel-stone-200);
-    transition: background-color 0.2s;
-    cursor: grabbing;
-  }
-
-  &.hide {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  @media screen and (max-width: 600px) {
-    display: none;
-    pointer-events: none;
-  }
-}
-
-.dark .drag-handle {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' style='fill: rgba(255, 255, 255, 0.5)'%3E%3Cpath d='M3,2 C2.44771525,2 2,1.55228475 2,1 C2,0.44771525 2.44771525,0 3,0 C3.55228475,0 4,0.44771525 4,1 C4,1.55228475 3.55228475,2 3,2 Z M3,6 C2.44771525,6 2,5.55228475 2,5 C2,4.44771525 2.44771525,4 3,4 C3.55228475,4 4,4.44771525 4,5 C4,5.55228475 3.55228475,6 3,6 Z M3,10 C2.44771525,10 2,9.55228475 2,9 C2,8.44771525 2.44771525,8 3,8 C3.55228475,8 4,8.44771525 4,9 C4,9.55228475 3.55228475,10 3,10 Z M7,2 C6.44771525,2 6,1.55228475 6,1 C6,0.44771525 6.44771525,0 7,0 C7.55228475,0 8,0.44771525 8,1 C8,1.55228475 7.55228475,2 7,2 Z M7,6 C6.44771525,6 6,5.55228475 6,5 C6,4.44771525 6.44771525,4 7,4 C7.55228475,4 8,4.44771525 8,5 C8,5.55228475 7.55228475,6 7,6 Z M7,10 C6.44771525,10 6,9.55228475 6,9 C6,8.44771525 6.44771525,8 7,8 C7.55228475,8 8,8.44771525 8,9 C8,9.55228475 7.55228475,10 7,10 Z'%3E%3C/path%3E%3C/svg%3E");
-}
-
-/* Custom Youtube Video CSS */
-iframe {
-  border: 8px solid #ffd00027;
-  border-radius: 4px;
-  min-width: 200px;
-  min-height: 200px;
-  display: block;
-  outline: 0px solid transparent;
-}
-
-div[data-youtube-video] > iframe {
-  cursor: move;
-  aspect-ratio: 16 / 9;
-  width: 100%;
-}
-
-.ProseMirror-selectednode iframe {
-  transition: outline 0.15s;
-  outline: 6px solid #fbbf24;
-}
-
-@media only screen and (max-width: 480px) {
-  div[data-youtube-video] > iframe {
-    max-height: 50px;
-  }
-}
-
-@media only screen and (max-width: 720px) {
-  div[data-youtube-video] > iframe {
-    max-height: 100px;
-  }
-}
-
-/* CSS for bold coloring and highlighting issue*/
-span[style] > strong {
-  color: inherit;
-}
-
-mark[style] > strong {
-  color: inherit;
-}
-
-.prose code {
-  @apply bg-gray-100;
-}
-.prose pre {
-  @apply ml-3 bg-gray-100 text-black;
-  overflow-x: auto;
-  font-weight: 400;
-  font-size: 0.875em;
-  line-height: 1.7142857;
-  margin-top: 1.7142857em;
-  margin-bottom: 1.7142857em;
-  border-radius: 0.375rem;
-  padding: 0.8571429em 1.1428571em;
-}
-
-.prose code {
-  font-weight: 600;
-  font-size: 0.875em;
-}
-
-.prose pre code {
-  color: inherit;
-  font-weight: inherit;
-  font-size: inherit;
-  background-color: transparent;
-  border-width: 0;
-  border-radius: 0;
-  padding: 0;
-  font-family: inherit;
-  line-height: inherit;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
+  .drag-handle {
+    position: fixed;
     opacity: 1;
-  }
-}
+    transition: opacity ease-in 0.2s;
+    border-radius: 0.25rem;
 
-@keyframes slide-up {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' style='fill: rgba(0, 0, 0, 0.5)'%3E%3Cpath d='M3,2 C2.44771525,2 2,1.55228475 2,1 C2,0.44771525 2.44771525,0 3,0 C3.55228475,0 4,0.44771525 4,1 C4,1.55228475 3.55228475,2 3,2 Z M3,6 C2.44771525,6 2,5.55228475 2,5 C2,4.44771525 2.44771525,4 3,4 C3.55228475,4 4,4.44771525 4,5 C4,5.55228475 3.55228475,6 3,6 Z M3,10 C2.44771525,10 2,9.55228475 2,9 C2,8.44771525 2.44771525,8 3,8 C3.55228475,8 4,8.44771525 4,9 C4,9.55228475 3.55228475,10 3,10 Z M7,2 C6.44771525,2 6,1.55228475 6,1 C6,0.44771525 6.44771525,0 7,0 C7.55228475,0 8,0.44771525 8,1 C8,1.55228475 7.55228475,2 7,2 Z M7,6 C6.44771525,6 6,5.55228475 6,5 C6,4.44771525 6.44771525,4 7,4 C7.55228475,4 8,4.44771525 8,5 C8,5.55228475 7.55228475,6 7,6 Z M7,10 C6.44771525,10 6,9.55228475 6,9 C6,8.44771525 6.44771525,8 7,8 C7.55228475,8 8,8.44771525 8,9 C8,9.55228475 7.55228475,10 7,10 Z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: calc(0.5em + 0.375rem) calc(0.5em + 0.375rem);
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 1.2rem;
+    height: 1.5rem;
+    z-index: 50;
+    cursor: grab;
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
-}
+    &:hover {
+      background-color: var(--novel-stone-100);
+      transition: background-color 0.2s;
+    }
 
-.animate-slide-up {
-  animation: slide-up 0.8s ease-out;
+    &:active {
+      background-color: var(--novel-stone-200);
+      transition: background-color 0.2s;
+      cursor: grabbing;
+    }
+
+    &.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @media screen and (max-width: 600px) {
+      display: none;
+      pointer-events: none;
+    }
+  }
+
+  .dark .drag-handle {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' style='fill: rgba(255, 255, 255, 0.5)'%3E%3Cpath d='M3,2 C2.44771525,2 2,1.55228475 2,1 C2,0.44771525 2.44771525,0 3,0 C3.55228475,0 4,0.44771525 4,1 C4,1.55228475 3.55228475,2 3,2 Z M3,6 C2.44771525,6 2,5.55228475 2,5 C2,4.44771525 2.44771525,4 3,4 C3.55228475,4 4,4.44771525 4,5 C4,5.55228475 3.55228475,6 3,6 Z M3,10 C2.44771525,10 2,9.55228475 2,9 C2,8.44771525 2.44771525,8 3,8 C3.55228475,8 4,8.44771525 4,9 C4,9.55228475 3.55228475,10 3,10 Z M7,2 C6.44771525,2 6,1.55228475 6,1 C6,0.44771525 6.44771525,0 7,0 C7.55228475,0 8,0.44771525 8,1 C8,1.55228475 7.55228475,2 7,2 Z M7,6 C6.44771525,6 6,5.55228475 6,5 C6,4.44771525 6.44771525,4 7,4 C7.55228475,4 8,4.44771525 8,5 C8,5.55228475 7.55228475,6 7,6 Z M7,10 C6.44771525,10 6,9.55228475 6,9 C6,8.44771525 6.44771525,8 7,8 C7.55228475,8 8,8.44771525 8,9 C8,9.55228475 7.55228475,10 7,10 Z'%3E%3C/path%3E%3C/svg%3E");
+  }
+
+  /* Custom Youtube Video CSS */
+  iframe {
+    border: 8px solid #ffd00027;
+    border-radius: 4px;
+    min-width: 200px;
+    min-height: 200px;
+    display: block;
+    outline: 0px solid transparent;
+  }
+
+  div[data-youtube-video] > iframe {
+    cursor: move;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+  }
+
+  .ProseMirror-selectednode iframe {
+    transition: outline 0.15s;
+    outline: 6px solid #fbbf24;
+  }
+
+  @media only screen and (max-width: 480px) {
+    div[data-youtube-video] > iframe {
+      max-height: 50px;
+    }
+  }
+
+  @media only screen and (max-width: 720px) {
+    div[data-youtube-video] > iframe {
+      max-height: 100px;
+    }
+  }
+
+  /* CSS for bold coloring and highlighting issue*/
+  span[style] > strong {
+    color: inherit;
+  }
+
+  mark[style] > strong {
+    color: inherit;
+  }
+
+  .prose code {
+    @apply bg-gray-100;
+  }
+  .prose pre {
+    @apply ml-3 bg-gray-100 text-black;
+    overflow-x: auto;
+    font-weight: 400;
+    font-size: 0.875em;
+    line-height: 1.7142857;
+    margin-top: 1.7142857em;
+    margin-bottom: 1.7142857em;
+    border-radius: 0.375rem;
+    padding: 0.8571429em 1.1428571em;
+  }
+
+  .prose code {
+    font-weight: 600;
+    font-size: 0.875em;
+  }
+
+  .prose pre code {
+    color: inherit;
+    font-weight: inherit;
+    font-size: inherit;
+    background-color: transparent;
+    border-width: 0;
+    border-radius: 0;
+    padding: 0;
+    font-family: inherit;
+    line-height: inherit;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.8s ease-out;
+  }
 }
 
 @layer base {

@@ -70,12 +70,12 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation Bar */}
-      <div className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-sm">
+      <div className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-xs">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-header items-center justify-between">
             {/* Left section - Logo and Navigation */}
             <div className="flex flex-1 items-center">
-              <div className="flex flex-shrink-0 items-center">
+              <div className="flex shrink-0 items-center">
                 <Button
                   variant="ghost"
                   size="icon"

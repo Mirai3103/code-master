@@ -63,7 +63,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
               setSelectedRow(row.original);
               setOpen("delete");
             }}
-            className="!text-red-500"
+            className="text-red-500!"
           >
             Xóa bài toán
             <DropdownMenuShortcut>
@@ -76,7 +76,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
               mutate(row.original.problemId);
             }}
             className={cn(
-              row.original.isPublic ? "!text-yellow-500" : "!text-green-500",
+              row.original.isPublic ? "text-yellow-500!" : "text-green-500!",
             )}
           >
             {row.original.isPublic

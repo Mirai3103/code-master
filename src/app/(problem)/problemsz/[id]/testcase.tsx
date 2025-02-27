@@ -34,7 +34,7 @@ export default function TestcaseRunner({
         <AccordionTrigger
           disabled={isTestcaseHidden}
           className={cn(
-            "flex rounded-lg p-4 shadow-sm hover:no-underline data-[state=open]:rounded-b-none",
+            "flex rounded-lg p-4 shadow-xs hover:no-underline data-[state=open]:rounded-b-none",
             isTestcaseHidden
               ? "cursor-not-allowed bg-gray-50"
               : "cursor-pointer bg-white",
@@ -60,7 +60,7 @@ export default function TestcaseRunner({
             </div>
           </div>
         </AccordionTrigger>
-        <AccordionContent className="mt-px space-y-4 rounded-b-lg bg-white p-4 shadow-sm">
+        <AccordionContent className="mt-px space-y-4 rounded-b-lg bg-white p-4 shadow-xs">
           <div className="space-y-4">
             <div>
               <div className="mb-2 text-sm text-gray-500">Input</div>

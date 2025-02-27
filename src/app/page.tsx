@@ -13,7 +13,7 @@ import Link from "next/link";
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
+    <div className="min-h-screen bg-linear-to-b from-white to-blue-50">
       {/* Hero Section */}
       <header className="container mx-auto px-4 py-16">
         <nav className="mb-16 flex items-center justify-between">
@@ -52,7 +52,7 @@ const LandingPage = () => {
         </nav>
 
         <div className="mx-auto max-w-4xl text-center">
-          <h1 className="animate-fade-in mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-6xl font-bold text-transparent">
+          <h1 className="animate-fade-in mb-6 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-6xl font-bold text-transparent">
             Nâng Cao Kỹ Năng Lập Trình & Phỏng Vấn
           </h1>
           <p className="animate-slide-up mb-8 text-xl text-gray-600">
@@ -101,7 +101,7 @@ const LandingPage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="bg-gradient-to-r from-blue-50 to-purple-50 py-16">
+      <section className="bg-linear-to-r from-blue-50 to-purple-50 py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
             <StatCard number="2Tr+" label="Người Dùng" />
@@ -149,7 +149,7 @@ const FeatureCard = ({
 
 // Stat Card Component
 const StatCard = ({ number, label }: { number: string; label: string }) => (
-  <div className="rounded-lg bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md">
+  <div className="rounded-lg bg-white p-6 shadow-xs transition-all duration-300 hover:shadow-md">
     <div className="mb-2 text-3xl font-bold text-blue-600">{number}</div>
     <div className="text-gray-600">{label}</div>
   </div>

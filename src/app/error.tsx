@@ -86,7 +86,7 @@ const ErrorPage = ({
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-gray-50 to-white p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-gray-50 to-white p-4">
       <div className="w-full max-w-md text-center">
         {/* Error Icon with Animation */}
         <div className="relative mx-auto mb-8 w-fit">

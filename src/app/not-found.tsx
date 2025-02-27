@@ -9,7 +9,7 @@ import {
 
 const NotFoundPage = () => {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-blue-50 to-white px-4 py-12 text-center">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-blue-50 to-white px-4 py-12 text-center">
       {/* Fun Animation */}
       <div className="mb-8 flex items-center justify-center">
         <div className="relative">
@@ -21,7 +21,7 @@ const NotFoundPage = () => {
 
       {/* Main Content */}
       <div className="max-w-md">
-        <h1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-6xl font-bold text-transparent">
+        <h1 className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-6xl font-bold text-transparent">
           404
         </h1>
         <p className="mt-4 text-2xl font-semibold text-gray-900">
@@ -46,7 +46,7 @@ const NotFoundPage = () => {
             <input
               type="search"
               placeholder="Tìm kiếm bài tập..."
-              className="w-full rounded-md border border-gray-200 bg-white py-2 pl-10 pr-4 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-md border border-gray-200 bg-white py-2 pl-10 pr-4 text-sm placeholder:text-gray-500 focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500"
             />
           </div>
         </div>

@@ -81,7 +81,7 @@ const ContestPage = () => {
           alt="Contest Banner"
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-blue-900/80 to-transparent" />
         <div className="absolute bottom-0 left-0 p-8 text-white">
           <h1 className="mb-2 text-3xl font-bold">CodePro Contest 2025</h1>
           <p className="text-lg opacity-90">
@@ -95,7 +95,7 @@ const ContestPage = () => {
 
       {/* Contest Stats Overview */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-purple-50 to-blue-50 p-4">
+        <Card className="bg-linear-to-br from-purple-50 to-blue-50 p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">Xếp hạng toàn cầu</p>
@@ -126,7 +126,7 @@ const ContestPage = () => {
               alt="Featured Contest"
               className="h-48 w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 p-6 text-white">
               <div className="mb-2 flex items-center gap-2">
                 <LuSparkles className="h-5 w-5" />
@@ -261,7 +261,7 @@ const ContestPage = () => {
                 alt="Top Rankers"
                 className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70" />
+              <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/70" />
               <h2 className="absolute bottom-4 left-4 flex items-center text-lg font-semibold text-white">
                 <Trophy className="mr-2 h-5 w-5 text-yellow-500" />
                 Top Cao Thủ
@@ -315,7 +315,7 @@ const ContestPage = () => {
                 alt="Recent Results"
                 className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70" />
+              <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/70" />
               <h2 className="absolute bottom-4 left-4 flex items-center text-lg font-semibold text-white">
                 <BarChart className="mr-2 h-5 w-5" />
                 Kết Quả Gần Đây

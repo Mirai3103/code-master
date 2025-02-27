@@ -124,7 +124,7 @@ const ContestDetail = () => {
           alt="Contest Banner"
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-blue-900/90 to-transparent" />
         <div className="absolute bottom-0 left-0 p-8 text-white">
           <div className="mb-4 flex items-center gap-2">
             <Trophy className="h-6 w-6 text-yellow-400" />
@@ -457,7 +457,7 @@ const ContestDetail = () => {
                       alt={`Contest ${index + 1}`}
                       className="h-full w-full object-cover transition-transform group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-2 left-2 text-white">
                       <div className="font-medium">
                         Weekly Contest {375 + index}

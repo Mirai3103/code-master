@@ -62,7 +62,7 @@ export function DataTableRowActions({
               setSelectedRow(row.original);
               setOpen("delete");
             }}
-            className="!text-red-500"
+            className="text-red-500!"
           >
             Xóa
             <DropdownMenuShortcut>

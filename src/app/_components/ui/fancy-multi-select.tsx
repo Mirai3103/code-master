@@ -210,7 +210,7 @@ export const FancyMultiSelect = React.forwardRef<
                 <button
                   type="button"
                   aria-label={`Remove ${option.label}`}
-                  className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  className="ml-1 rounded-full outline-hidden ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       handleUnselect(option);
@@ -239,7 +239,7 @@ export const FancyMultiSelect = React.forwardRef<
               placeholder={placeholder}
               disabled={disabled}
               aria-autocomplete="list"
-              className="ml-2 flex-1 bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+              className="ml-2 flex-1 bg-transparent outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
         </div>
@@ -249,7 +249,7 @@ export const FancyMultiSelect = React.forwardRef<
             {open && availableOptions.length > 0 && (
               <div
                 className={cn(
-                  "top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95",
+                  "top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-hidden animate-in fade-in-0 zoom-in-95",
                   floatingList && "absolute",
                 )}
                 role="listbox"

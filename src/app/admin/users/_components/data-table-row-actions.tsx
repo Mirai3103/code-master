@@ -57,7 +57,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             setSelectedRow(row.original);
             setOpen("permission");
           }}
-          className="!text-blue-500"
+          className="text-blue-500!"
         >
           Phân quyền
           <DropdownMenuShortcut>
@@ -70,7 +70,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             // mutate(row.original.id);
           }}
           className={cn(
-            row.original.emailVerified ? "!text-yellow-500" : "!text-green-500",
+            row.original.emailVerified ? "text-yellow-500!" : "text-green-500!",
           )}
         >
           {row.original.emailVerified

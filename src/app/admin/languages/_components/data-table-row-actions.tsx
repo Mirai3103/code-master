@@ -62,7 +62,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
               setSelectedRow(row.original);
               setOpen("delete");
             }}
-            className="!text-red-500"
+            className="text-red-500!"
           >
             Xóa thẻ
             <DropdownMenuShortcut>
@@ -75,7 +75,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
               setSelectedRow(null);
             }}
             className={cn(
-              row.original.isActive ? "!text-yellow-500" : "!text-green-500",
+              row.original.isActive ? "text-yellow-500!" : "text-green-500!",
             )}
           >
             {row.original.isActive ? "Ẩn" : "Hiện"}

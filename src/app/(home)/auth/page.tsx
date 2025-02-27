@@ -36,7 +36,7 @@ const AuthPage = () => {
     });
   };
   return (
-    <div className="flex min-h-content-screen items-center justify-center bg-gradient-to-b from-blue-50 to-white px-4 py-4">
+    <div className="flex min-h-content-screen items-center justify-center bg-linear-to-b from-blue-50 to-white px-4 py-4">
       <div className="w-full max-w-[440px]">
         {/* Logo */}
         <div className="mb-8 text-center">

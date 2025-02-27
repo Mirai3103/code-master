@@ -132,7 +132,7 @@ function SubmittingTab({ problemId }: ISubmittingTabProps) {
     return null;
   }
   return (
-    <div className="space-y-6 rounded-lg bg-white p-6 shadow">
+    <div className="space-y-6 rounded-lg bg-white p-6 shadow-sm">
       <div className="">
         <h2 className="mb-2 text-2xl font-bold">Trạng thái bài nộp của bạn</h2>
         <Badge
