@@ -53,3 +53,24 @@ export function mapToSubmissionStatus(sts: SubmissionTestcaseStatus[]) {
     return SubmissionStatus.MEMORY_LIMIT_EXCEEDED;
   return SubmissionStatus.ACCEPTED;
 }
+
+export function mapToSubmissionTestcaseStatus(
+  sts: SubmissionStatus,
+): SubmissionTestcaseStatus {
+  switch (sts) {
+    case SubmissionStatus.PENDING:
+      return SubmissionTestcaseStatus.RUNNING;
+    case SubmissionStatus.COMPILE_ERROR:
+      return SubmissionTestcaseStatus.CompileError;
+    case SubmissionStatus.RUNTIME_ERROR:
+      return SubmissionTestcaseStatus.RuntimeError;
+    case SubmissionStatus.WRONG_ANSWER:
+      return SubmissionTestcaseStatus.WrongAnswer;
+    case SubmissionStatus.TIME_LIMIT_EXCEEDED:
+      return SubmissionTestcaseStatus.TimeLimitExceeded;
+    case SubmissionStatus.MEMORY_LIMIT_EXCEEDED:
+      return SubmissionTestcaseStatus.MemoryLimitExceeded;
+    default:
+      return SubmissionTestcaseStatus.Success;
+  }
+}

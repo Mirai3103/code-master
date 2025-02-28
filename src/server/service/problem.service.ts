@@ -8,6 +8,8 @@ import {
   type ProblemQueryDTO,
   type UpdateProblemDTO,
 } from "../schema/problem.schema";
+import { getCurrentUser } from "@/util/getCurrentUser";
+import { SubmissionStatus } from "../schema/enum";
 
 export class ProblemService {
   constructor(
@@ -50,8 +52,36 @@ export class ProblemService {
       }),
       this.prisma.problem.count({ where }),
     ]);
-
-    return { data, total };
+    const currentUserId = await getCurrentUser();
+    if (currentUserId) {
+      const userSubmissions = await this.prisma.submission.findMany({
+        where: {
+          userId: currentUserId,
+          problemId: { in: data.map((p) => p.problemId) },
+          status: SubmissionStatus.ACCEPTED,
+        },
+        select: {
+          problemId: true,
+          status: true,
+        },
+      });
+      const userSubmissionsMap = userSubmissions.reduce(
+        (acc, sub) => {
+          acc[sub.problemId] = sub.status;
+          return acc;
+        },
+        {} as Record<string, string>,
+      );
+      data.forEach((problem) => {
+        (problem as any).isCurrentUserSolved =
+          userSubmissionsMap[problem.problemId] === SubmissionStatus.ACCEPTED;
+      });
+    }
+    type ProblemWithUserStatus = (typeof data)[0] & {
+      isCurrentUserSolved: boolean;
+    };
+    const dataWithUserStatus = data as ProblemWithUserStatus[];
+    return { data: dataWithUserStatus, total };
   }
 
   async findById(id: string) {

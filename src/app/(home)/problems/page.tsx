@@ -1,5 +1,4 @@
 import ProblemOfTheDay from "./problem-of-the-day";
-import StudyPlan from "./study-plan";
 import UpcomingContest from "./upcoming-contest";
 import UserStats from "./user-stats";
 import TopicProcess from "./topic-process";
@@ -30,17 +29,18 @@ const ProblemSet = async ({ searchParams }: Props) => {
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-12 gap-6">
           {/* Left Sidebar */}
-          <div className="col-span-3 space-y-6">
-            {/* Daily Challenge */}
-            <ProblemOfTheDay />
+          {/* <div className="col-span-3 space-y-6"> */}
+          {/* Daily Challenge */}
+          {/* <ProblemOfTheDay /> */}
 
-            {/* Learning Progress */}
-            <StudyPlan />
-            {/* Upcoming Contests */}
-            <UpcomingContest />
-          </div>
+          {/* Learning Progress */}
+          {/* <StudyPlan /> */}
+          {/* Upcoming Contests */}
+          {/* <UpcomingContest /> */}
+          {/* </div> */}
           {/* Main Content */}
           <ProblemsTable
+            className="col-span-9"
             problems={data[0] as never[]}
             currentPage={params.page || 1}
             totalPages={Math.ceil(
@@ -51,6 +51,8 @@ const ProblemSet = async ({ searchParams }: Props) => {
           <div className="col-span-3 space-y-6">
             {/* Personal Stats */}
             <UserStats />
+            <ProblemOfTheDay />
+            <UpcomingContest />
 
             {/* Topic Progress */}
             <TopicProcess />

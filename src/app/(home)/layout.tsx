@@ -11,17 +11,17 @@ import {
   LuHouse as LuHome,
 } from "react-icons/lu";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import { cn } from "../_lib/utils";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../_components/ui/dropdown-menu";
 const NAVIGATION = [
   { name: "Trang Chủ", icon: LuHome, href: "/problems", current: true },
   { name: "Khóa Học", icon: Book, href: "/courses", current: false },
@@ -72,7 +72,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Top Navigation Bar */}
       <div className="sticky top-0 z-50 border-b border-gray-200 bg-white shadow-xs">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-header items-center justify-between">
+          <div className="h-header flex items-center justify-between">
             {/* Left section - Logo and Navigation */}
             <div className="flex flex-1 items-center">
               <div className="flex shrink-0 items-center">
@@ -123,7 +123,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
                 className="relative text-gray-600"
               >
                 <Bell className="h-5 w-5" />
-                <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500"></span>
+                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500"></span>
               </Button>
 
               {/* Progress Stats */}
@@ -139,18 +139,22 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
               </div> */}
 
               {/* User Menu */}
-              <Select>
-                <SelectTrigger className="w-fit min-w-[180px] border-none">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="w-fit min-w-[180px] border-none">
                   <UserAvatar />
-                </SelectTrigger>
-                <SelectContent align="end" className="w-[200px]">
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[200px]">
                   {userNavigation.map((item) => (
-                    <SelectItem key={item.name} value={item.href}>
-                      {item.name}
-                    </SelectItem>
+                    <DropdownMenuItem
+                      key={item.name}
+                      asChild
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <Link href={item.href}>{item.name}</Link>
+                    </DropdownMenuItem>
                   ))}
-                </SelectContent>
-              </Select>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
@@ -162,10 +166,10 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 flex md:hidden">
           <div
-            className="fixed inset-0 bg-gray-600 bg-opacity-75"
+            className="bg-opacity-75 fixed inset-0 bg-gray-600"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white pb-4 pt-5">
+          <div className="relative flex w-full max-w-xs flex-1 flex-col bg-white pt-5 pb-4">
             <nav className="mt-5 space-y-1 px-2">
               {navigation.map((item) => (
                 <Button
@@ -185,7 +189,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Main Content */}
       <main
         className={cn(
-          "mx-auto h-content-screen",
+          "h-content-screen mx-auto",
           !isExceptPath && "max-w-8xl px-4 py-2 sm:px-6 lg:px-8",
         )}
       >

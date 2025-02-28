@@ -41,7 +41,7 @@ export default function DetailSide({ problem }: Props) {
   }, [isClient, problem]);
   return (
     <ResizablePanel defaultSize={50} collapsible minSize={30}>
-      <ScrollArea className="h-full border-r border-gray-200 bg-white">
+      <ScrollArea className="scroll-area h-full border-r border-gray-200 bg-white">
         <div className="sticky top-0 z-10 border-b border-gray-200 bg-white px-6 py-4">
           <div className="mb-4 flex items-center justify-between">
             <h1 className="text-xl font-bold text-gray-900">{problem.title}</h1>

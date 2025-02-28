@@ -19,16 +19,19 @@ import {
   TableRow,
 } from "@/app/_components/ui/table";
 import { useRouter } from "next/navigation";
+import { cn } from "@/app/_lib/utils";
 interface Props {
   problems: Problem[];
   currentPage: number;
   totalPages: number;
+  className?: string;
 }
 
 export default function ProblemsTable({
   problems,
   currentPage,
   totalPages,
+  className,
 }: Props) {
   const [_, setParams] = usePaginationParams({});
   const handlePageChange = (page: number) => {
@@ -38,7 +41,7 @@ export default function ProblemsTable({
   };
   const route = useRouter();
   return (
-    <div className="col-span-6 space-y-6">
+    <div className={cn("space-y-6", className)}>
       {/* Filters */}
       <Card className="p-4 pb-2">
         <ProblemFilters />
@@ -57,7 +60,7 @@ export default function ProblemsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {problems.map((problem, index) => (
+            {problems.map((problem: any, index) => (
               <TableRow
                 key={problem.problemId}
                 onClick={() => route.push(`/problems/${problem.problemId}`)}
@@ -84,7 +87,9 @@ export default function ProblemsTable({
                   {problem.acceptedSubmissions}/{problem.totalSubmissions}
                 </TableCell>
                 <TableCell className="flex justify-center">
-                  {getStatusIcon("attempted")}
+                  {getStatusIcon(
+                    problem.isCurrentUserSolved ? "solved" : "attempted",
+                  )}
                 </TableCell>
               </TableRow>
             ))}

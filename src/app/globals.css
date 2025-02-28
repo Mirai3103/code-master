@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @plugin '@tailwindcss/typography';
 @plugin 'tailwindcss-animate';
@@ -181,7 +181,7 @@
 
 @layer utilities {
   .ProseMirror {
-    @apply prose-sm max-w-none rounded-md border border-input px-3 py-1 shadow-xs focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring;
+    @apply prose-sm border-input focus-visible:ring-ring max-w-none rounded-md border px-3 py-1 shadow-xs focus-visible:ring-1 focus-visible:outline-hidden;
   }
   .ProseMirror > ul {
     @apply my-1 ml-6 list-disc;
@@ -224,7 +224,7 @@
     position: relative;
 
     &:before {
-      content: '';
+      content: "";
       box-sizing: border-box;
       position: absolute;
       top: 50%;
@@ -245,18 +245,18 @@
   }
 
   /* Custom TODO list checkboxes – shoutout to this awesome tutorial: https://moderncss.dev/pure-css-custom-checkbox-style/ */
-  ul[data-type='taskList'] li > label {
+  ul[data-type="taskList"] li > label {
     margin-right: 0.2rem;
     user-select: none;
   }
 
   @media screen and (max-width: 768px) {
-    ul[data-type='taskList'] li > label {
+    ul[data-type="taskList"] li > label {
       margin-right: 0.5rem;
     }
   }
 
-  ul[data-type='taskList'] li > label input[type='checkbox'] {
+  ul[data-type="taskList"] li > label input[type="checkbox"] {
     -webkit-appearance: none;
     appearance: none;
     background-color: hsl(var(--background));
@@ -280,7 +280,7 @@
     }
 
     &::before {
-      content: '';
+      content: "";
       width: 0.65em;
       height: 0.65em;
       transform: scale(0);
@@ -295,7 +295,7 @@
     }
   }
 
-  ul[data-type='taskList'] li[data-checked='true'] > div > p {
+  ul[data-type="taskList"] li[data-checked="true"] > div > p {
     color: var(--muted-foreground);
     text-decoration: line-through;
     text-decoration-thickness: 2px;
@@ -484,4 +484,8 @@
 
 .dark .long-code-block::-webkit-scrollbar-thumb {
   @apply bg-neutral-500;
+}
+
+.scroll-area [data-radix-scroll-area-viewport] > div {
+  display: block !important;
 }

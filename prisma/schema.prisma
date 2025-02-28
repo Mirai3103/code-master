@@ -27,6 +27,31 @@ model User {
   updatedAt DateTime @updatedAt
   rules     Json?    @db.JsonB
   Role      Role[]
+
+  profile Profile?
+
+  participantContests ContestParticipant[] @relation(map: "ContestParticipant_UserId_User_Id_fk")
+}
+
+model Profile {
+  id           String    @id @default(cuid()) @db.VarChar(100)
+  bio          String?
+  image        String?
+  user         User      @relation(fields: [id], references: [id], onDelete: Cascade)
+  gender       String?
+  location     String?
+  birthdate    DateTime? @db.Date
+  website      String?
+  github       String?
+  linkedin     String?
+  twitter      String?
+  works        Json?     @db.JsonB
+  education    Json?     @db.JsonB
+  skills       Json?     @db.JsonB
+  streak       Int       @default(0)
+  globalPoints Int       @default(0)
+  totalSolved  Int       @default(0)
+  updatedAt    DateTime  @updatedAt
 }
 
 model Account {
@@ -140,11 +165,14 @@ model Problem {
   createdBy           String?              @db.VarChar(100)
   updatedBy           String?              @db.VarChar(100)
   deletedBy           String?              @db.VarChar(100)
+  hints               Json?                @db.Json
   problemLanguages    ProblemLanguage[]
   problemTags         ProblemTag[]
   submissions         Submission[]
   submissionTestcases SubmissionTestcase[]
   testcases           Testcase[]
+  metadata            Json?                @db.Json
+  problemContests     ProblemContest[]     @relation(map: "ProblemContest_ProblemId_Problem_ProblemId_fk")
 
   @@map("Problem")
 }
@@ -191,8 +219,8 @@ model Submission {
   problem             Problem              @relation(fields: [problemId], references: [problemId], onDelete: NoAction, onUpdate: NoAction, map: "Submission_ProblemId_Problem_ProblemId_fk")
   submissionTestcases SubmissionTestcase[] @relation("SubmissionTestcase_SubmissionId_ToSubmission")
   language            Language             @relation(fields: [languageId], references: [languageId], onDelete: NoAction, onUpdate: NoAction, map: "Submission_LanguageId_Language_LanguageId_fk")
-
-  @@map("Submission")
+  problemContestId    String?              @db.Uuid
+  problemContest      ProblemContest?      @relation(fields: [problemContestId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Submission_ProblemContestId_ProblemContest_ProblemContestId_fk")
 }
 
 model SubmissionTestcase {
@@ -240,6 +268,61 @@ model Testcase {
   deletedBy           String?              @db.VarChar(100)
   problem             Problem              @relation(fields: [problemId], references: [problemId], onDelete: Cascade, map: "Testcase_ProblemId_Problem_ProblemId_fk")
   submissionTestcases SubmissionTestcase[]
+  metadata            Json?                @db.Json
 
   @@map("Testcase")
+}
+
+model Contest {
+  contestId         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title             String   @db.VarChar(255)
+  description       String?  @db.VarChar(255)
+  totalParticipants Int      @default(0) @db.Integer
+  startTime         DateTime
+  endTime           DateTime
+  details           Json?    @db.JsonB
+  prices            Json?    @db.JsonB
+  isPublic          Boolean  @default(true)
+  image             String?
+  status            String   @default("DRAFT") @db.VarChar(50)
+
+  contestProblems ProblemContest[] @relation(map: "ProblemContest_ContestId_Contest_ContestId_fk")
+
+  leaderboards Leaderboard[] @relation(map: "Leaderboard_ContestId_Contest_ContestId_fk")
+
+  contestParticipants ContestParticipant[] @relation(map: "ContestParticipant_ContestId_Contest_ContestId_fk")
+}
+
+model ProblemContest {
+  id          String       @id @default(uuid()) @db.Uuid
+  contestId   String       @db.Uuid
+  problemId   String       @db.Uuid
+  problem     Problem      @relation(fields: [problemId], references: [problemId], onDelete: Cascade, map: "ProblemContest_ProblemId_Problem_ProblemId_fk")
+  contest     Contest      @relation(fields: [contestId], references: [contestId], onDelete: Cascade, map: "ProblemContest_ContestId_Contest_ContestId_fk")
+  submissions Submission[]
+
+  @@map("ProblemContest")
+}
+
+model Leaderboard {
+  contestId    String   @db.Uuid
+  userId       String   @db.VarChar(100)
+  points       Int      @default(0) @db.Integer
+  rank         Int      @default(0) @db.Integer
+  totalTime    Int      @default(0) @db.Integer
+  totalSolved  Int      @default(0) @db.Integer
+  contest      Contest  @relation(fields: [contestId], references: [contestId], onDelete: Cascade, map: "Leaderboard_ContestId_Contest_ContestId_fk")
+  submissionAt DateTime
+
+  @@id([contestId, userId], map: "Leaderboard_ContestId_UserId_pk")
+}
+
+model ContestParticipant {
+  contestId  String   @db.Uuid
+  userId     String   @db.VarChar(100)
+  contest    Contest  @relation(fields: [contestId], references: [contestId], onDelete: Cascade, map: "ContestParticipant_ContestId_Contest_ContestId_fk")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "ContestParticipant_UserId_User_Id_fk")
+  registerAt DateTime
+
+  @@id([contestId, userId], map: "ContestParticipant_ContestId_UserId_pk")
 }
