@@ -377,6 +377,28 @@ export class SubmissionService extends AbstractService {
       },
     });
   }
+
+  public async getSubmissionsHistory(problemId: string, userId: string) {
+    return this.db.submission.findMany({
+      where: { problemId, userId },
+      select: {
+        language: {
+          select: {
+            languageName: true,
+            version: true,
+          },
+        },
+        languageId: true,
+        submissionId: true,
+        status: true,
+        timeExecutionInMs: true,
+        memoryUsageInKb: true,
+        submissionTime: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  }
 }
 
 export type SubmissionById = NonNullable<

@@ -24,6 +24,7 @@ import { StarterKit } from "novel";
 import { Tag as ITag } from "@/server/schema/tag.schema";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
 import SubmissionProgressTab from "./_components/SubmissionTab";
+import SubmissionsTable from "./_components/SubmissionTable";
 interface Props {
   problem: Problem & {
     problemTags: Partial<ITag & { tag: { tagName: string } }>[];
@@ -120,6 +121,9 @@ export default function DetailSide({ problem }: Props) {
                   </div>
                 </div>
               </div>
+            </TabsContent>
+            <TabsContent value="history">
+              <SubmissionsTable problemId={problem.problemId!} />
             </TabsContent>
             <TabsContent value="submission">
               <SubmissionProgressTab />
