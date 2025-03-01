@@ -108,10 +108,10 @@ async function main() {
   listTag.push({
     tagName: "Bit Manipulation",
   });
-  await prisma.tag.createMany({
-    data: listTag,
-    skipDuplicates: true,
-  });
+  // await prisma.tag.createMany({
+  //   data: listTag,
+  //   skipDuplicates: true,
+  // });
 }
 
 main()

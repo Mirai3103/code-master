@@ -105,14 +105,24 @@ async function initAdminUser(client: PrismaClient) {
       },
     },
   });
+  client.account.create({
+    data: {
+      provider: "credentials",
+      userId: newAdmin.id,
+      providerAccountId: "credentials",
+      type: "email",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  });
 }
 
 async function main() {
   const prisma = new PrismaClient();
-  // await initResources(prisma, true);
-  // await initActions(prisma, true);
-  // await initRoles(prisma, true);
-  // await initAdminUser(prisma);
+  await initResources(prisma, true);
+  await initActions(prisma, true);
+  await initRoles(prisma, true);
+  await initAdminUser(prisma);
   return prisma;
 }
 

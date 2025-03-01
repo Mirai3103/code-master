@@ -23,7 +23,6 @@ import TextAlign from "@tiptap/extension-text-align";
 import TextStyle from "@tiptap/extension-text-style";
 import Typography from "@tiptap/extension-typography";
 import { PrismaClient, Problem, ProblemTag, Tag } from "@prisma/client";
-import { readFileSync } from "fs";
 
 const prisma = new PrismaClient();
 const queue = new PQueue({ concurrency: 1 });
@@ -228,22 +227,22 @@ async function getProblemsDetail(
 async function main() {
   try {
     // Uncomment to fetch from API instead of using local file
-    // const response = await axios.get<ProblemsResponse>(
-    //   "https://alfa-leetcode-api.onrender.com/problems?skip=40&limit=100",
-    // );
-    // const briefProblems = response.data.problemsetQuestionList;
+    const response = await axios.get<ProblemsResponse>(
+      "https://alfa-leetcode-api.onrender.com/problems?limit=100",
+    );
+    const briefProblems = response.data.problemsetQuestionList;
 
     // Use a relative path or environment variable for the file path
-    const filePath =
-      process.env.PROBLEMS_JSON_PATH ||
-      "C:/Users/BaoBao/Downloads/problems.json";
-    console.log(`Reading problems from ${filePath}`);
+    // const filePath =
+    //   process.env.PROBLEMS_JSON_PATH ||
+    //   "C:/Users/BaoBao/Downloads/problems.json";
+    // console.log(`Reading problems from ${filePath}`);
 
-    const problemsData = JSON.parse(
-      readFileSync(filePath, "utf-8"),
-    ) as ProblemsResponse;
+    // const problemsData = JSON.parse(
+    //   readFileSync(filePath, "utf-8"),
+    // ) as ProblemsResponse;
 
-    const briefProblems = problemsData.problemsetQuestionList;
+    // const briefProblems = problemsData.problemsetQuestionList;
 
     // Add items to queue with proper error handling
     for (const briefProblem of briefProblems) {
