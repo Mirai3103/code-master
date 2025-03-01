@@ -84,7 +84,11 @@ export default function ProblemsTable({
                   </span>
                 </TableCell>
                 <TableCell className="text-center text-gray-600">
-                  {problem.acceptedSubmissions}/{problem.totalSubmissions}
+                  {(
+                    (problem.acceptedSubmissions / problem.totalSubmissions) *
+                      100 || 0
+                  ).toFixed(2)}
+                  %
                 </TableCell>
                 <TableCell className="flex justify-center">
                   {getStatusIcon(

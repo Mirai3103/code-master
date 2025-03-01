@@ -49,11 +49,16 @@ async function generateFakeSubmissions() {
         SubmissionStatus.RUNTIME_ERROR,
       ];
       if (problem.difficultyLevel === DifficultyLevel.EASY) {
-        ranArr.push(SubmissionStatus.ACCEPTED, SubmissionStatus.ACCEPTED);
+        ranArr.push(
+          SubmissionStatus.ACCEPTED,
+          SubmissionStatus.ACCEPTED,
+          SubmissionStatus.ACCEPTED,
+        );
       }
       if (problem.difficultyLevel === DifficultyLevel.MEDIUM) {
         ranArr.push(
           SubmissionStatus.WRONG_ANSWER,
+          SubmissionStatus.ACCEPTED,
           SubmissionStatus.ACCEPTED,
           SubmissionStatus.TIME_LIMIT_EXCEEDED,
         );

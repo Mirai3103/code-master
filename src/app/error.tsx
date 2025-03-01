@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   LuHouse as Home,
@@ -10,6 +9,7 @@ import {
   LuServer as Server,
   LuShieldOff as ShieldOff,
 } from "react-icons/lu";
+import { useRouter } from "next/navigation";
 
 interface ErrorPageProps {
   code?: number;
@@ -22,9 +22,7 @@ const ErrorPage = ({
   title = "Đã xảy ra lỗi",
   message = "Rất tiếc, đã có lỗi xảy ra. Vui lòng thử lại sau.",
 }: ErrorPageProps) => {
-  const [retryCount, setRetryCount] = useState(0);
-  const [isRetrying, setIsRetrying] = useState(false);
-
+  const router = useRouter();
   const getErrorIcon = () => {
     switch (code) {
       case 403:
@@ -76,13 +74,7 @@ const ErrorPage = ({
   };
 
   const handleRetry = () => {
-    setIsRetrying(true);
-    setRetryCount((prev) => prev + 1);
-
-    // Giả lập retry
-    setTimeout(() => {
-      setIsRetrying(false);
-    }, 1500);
+    router.refresh();
   };
 
   return (
@@ -91,7 +83,7 @@ const ErrorPage = ({
         {/* Error Icon with Animation */}
         <div className="relative mx-auto mb-8 w-fit">
           {getErrorIcon()}
-          <div className="absolute -right-2 top-0 h-4 w-4 animate-ping rounded-full bg-red-100"></div>
+          <div className="absolute top-0 -right-2 h-4 w-4 animate-ping rounded-full bg-red-100"></div>
         </div>
 
         {/* Error Code */}
@@ -109,20 +101,9 @@ const ErrorPage = ({
 
           {/* Action Buttons */}
           <div className="mt-6 space-y-3">
-            <Button
-              onClick={handleRetry}
-              className="relative w-full gap-2"
-              disabled={isRetrying}
-            >
-              <Refresh
-                className={`h-4 w-4 ${isRetrying ? "animate-spin" : ""}`}
-              />
-              {isRetrying ? "Đang thử lại..." : "Thử lại"}
-              {retryCount > 0 && (
-                <span className="absolute right-2 top-1 rounded-full bg-red-100 px-1.5 py-0.5 text-xs text-red-600">
-                  {retryCount}
-                </span>
-              )}
+            <Button onClick={handleRetry} className="relative w-full gap-2">
+              <Refresh className={`h-4 w-4`} />
+              Thử lại
             </Button>
             <Button variant="outline" className="w-full gap-2">
               <Home className="h-4 w-4" />

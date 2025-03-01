@@ -21,6 +21,9 @@ const ProblemSet = async ({ searchParams }: Props) => {
   const params = await searchParams;
   const data = await trpc.problems.getProblems({
     isPublic: true,
+    difficultyLevel: params.difficulty
+      ? [Number(params.difficulty)]
+      : undefined,
     ...params,
   });
   return (
