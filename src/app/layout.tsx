@@ -8,6 +8,7 @@ import Providers from "./session-provider";
 import { TRPCReactProvider } from "@/trpc/react";
 import { auth } from "@/server/auth";
 import { Toaster } from "sonner";
+import AbilityProvider from "./_contexts/ability-context";
 const spaceGrotesk = Space_Grotesk({
   display: "auto",
   subsets: ["vietnamese"],
@@ -27,18 +28,21 @@ export default async function RootLayout({
   modal: React.ReactNode;
 }>) {
   const session = await auth();
+  const rules = session?.user?.rules;
   return (
     <html lang="vi">
       <head></head>
       <body className={`${spaceGrotesk.className} text-text bg-background`}>
-        <Providers session={session}>
-          <NextTopLoader />
-          <NuqsAdapter>
-            <TRPCReactProvider>{children}</TRPCReactProvider>
-          </NuqsAdapter>
-          <Toaster />
-          {modal}
-        </Providers>
+        <AbilityProvider rules={rules}>
+          <Providers session={session}>
+            <NextTopLoader />
+            <NuqsAdapter>
+              <TRPCReactProvider>{children}</TRPCReactProvider>
+            </NuqsAdapter>
+            <Toaster />
+            {modal}
+          </Providers>
+        </AbilityProvider>
       </body>
     </html>
   );

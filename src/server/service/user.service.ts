@@ -6,7 +6,7 @@ import {
 } from "../schema/user.schema";
 import AbstractService from "./abstract.service";
 import { verifyPassword } from "@/util/password";
-
+import { JsonArray } from "@prisma/client/runtime/library";
 export class UserService extends AbstractService {
   constructor(db: PrismaClient) {
     super(db);
@@ -174,5 +174,31 @@ export class UserService extends AbstractService {
         },
       },
     });
+  }
+  async getUserPermissions(userId: string) {
+    // find all user role
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        Role: {
+          select: {
+            roleId: true,
+            rules: true,
+          },
+        },
+        rules: true,
+      },
+    });
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const ruleList = user.Role.map((role) => role.rules).flat();
+    if (user.rules) {
+      ruleList.push(...(user.rules as JsonArray));
+    }
+    return ruleList;
   }
 }

@@ -50,7 +50,6 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
     return EXCEPT_PATHS.some((path) => path.test(pathname));
   }, [pathname]);
   const { data: session } = useSession();
-
   const UserAvatar = () => (
     <div className="flex items-center gap-2">
       <img

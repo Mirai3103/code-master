@@ -59,7 +59,6 @@ export default function EditForm({ role }: IProp) {
     if (!data.isTouchedRules) {
       delete payload.rules;
     }
-    console.log("Form data:", data);
     mutateAsync(data)
       .then((data) => {
         toast.success("Vai trò đã được cập nhật thành công");
@@ -69,7 +68,7 @@ export default function EditForm({ role }: IProp) {
         toast.success("Đã có lỗi xảy ra");
       });
   };
-  console.log(form.formState.errors, role);
+  console.log(fields);
   return (
     <div>
       <Header sticky>
@@ -150,7 +149,10 @@ export default function EditForm({ role }: IProp) {
                     >
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                          {rule.action.map((action) => (
+                          {(!Array.isArray(rule.action)
+                            ? [rule.action]
+                            : rule.action
+                          ).map((action) => (
                             <Badge key={action} variant="secondary">
                               {
                                 actions?.find((a) => a.actionId === action)
@@ -159,7 +161,10 @@ export default function EditForm({ role }: IProp) {
                             </Badge>
                           ))}
                           <span className="font-medium">
-                            {rule.subject
+                            {(Array.isArray(rule.subject)
+                              ? rule.subject
+                              : [rule.subject]
+                            )
                               .map(
                                 (subject) =>
                                   resources?.find(

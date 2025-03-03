@@ -149,7 +149,7 @@ const RoleManagement = () => {
                     >
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                          {rule.action.map((action) => (
+                          {rule?.action?.map((action) => (
                             <Badge key={action} variant="secondary">
                               {
                                 actions?.find((a) => a.actionId === action)

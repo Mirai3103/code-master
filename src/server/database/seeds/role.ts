@@ -54,14 +54,21 @@ async function initRoles(client: PrismaClient, withClean = false) {
   }
   const adminRole: Prisma.JsonArray = [
     {
-      action: "manage",
-      subject: "all",
+      action: ["manage"],
+      subject: ["all"],
     },
   ];
   const everyoneRole: Prisma.JsonArray = [
     {
-      action: "read",
-      subject: "all",
+      action: ["read"],
+      subject: ["all"],
+    },
+  ];
+
+  const loginRole: Prisma.JsonArray = [
+    {
+      action: ["read"],
+      subject: ["all"],
     },
   ];
 
@@ -73,9 +80,15 @@ async function initRoles(client: PrismaClient, withClean = false) {
     },
     {
       roleId: "everyone",
-      roleName: "Mặc định",
-      description: "Đây là vai trò mặc định của tất cả người dùng khi hệ thống",
+      roleName: "Người dùng chưa đăng nhập",
+      description: "Đây là nhóm người dùng ẩn danh(chưa đăng nhập)",
       rules: everyoneRole,
+    },
+    {
+      roleId: "logged-in",
+      roleName: "Người dùng đã đăng nhập",
+      description: "Đây là nhóm người dùng đã đăng nhập",
+      rules: loginRole,
     },
   ];
   await client.role.createMany({

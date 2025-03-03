@@ -2,7 +2,6 @@ import { Role as GenRole } from "@prisma/client";
 import { z } from "zod";
 export enum SystemRole {
   Admin = "admin",
-  Everyone = "everyone",
 }
 const actions = z.enum(["create", "read", "update", "delete", "manage"]);
 export const ruleSchema = z.object({
