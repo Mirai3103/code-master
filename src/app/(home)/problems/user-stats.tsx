@@ -1,5 +1,6 @@
 "use client";
 import { Card } from "@/components/ui/card";
+import { useSession } from "next-auth/react";
 import { LuChartBar as BarChart2 } from "react-icons/lu";
 
 const userStats = {
@@ -9,7 +10,30 @@ const userStats = {
   contestRating: 1756,
 };
 
+function Skeleton() {
+  return (
+    <Card className="p-4">
+      <div className="mb-4 flex items-center">
+        <div className="mr-2 h-5 w-5 animate-pulse rounded bg-gray-200"></div>
+        <div className="h-6 w-40 animate-pulse rounded bg-gray-200"></div>
+      </div>
+      <div className="space-y-4">
+        {[1, 2, 3, 4].map((item) => (
+          <div key={item} className="flex items-center justify-between">
+            <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 export default function UserStats() {
+  const session = useSession();
+  if (session.status === "loading") return <Skeleton />;
+  if (session.status === "unauthenticated") return null;
+
   return (
     <Card className="p-4">
       <h3 className="mb-4 flex items-center text-lg font-semibold">

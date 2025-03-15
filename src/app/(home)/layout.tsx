@@ -16,24 +16,14 @@ import { usePathname } from "next/navigation";
 import { cn } from "../_lib/utils";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../_components/ui/dropdown-menu";
+import UserMenu from "../_components/user-menu";
 const NAVIGATION = [
   { name: "Trang Chủ", icon: LuHome, href: "/problems", current: true },
   { name: "Khóa Học", icon: Book, href: "/courses", current: false },
   { name: "Thi Đấu", icon: Trophy, href: "/contests", current: false },
   { name: "Cộng Đồng", icon: Users, href: "/community", current: false },
 ];
-const userNavigation = [
-  { name: "Hồ Sơ", href: "/profile" },
-  { name: "Cài Đặt", href: "/settings" },
-  { name: "Trợ Giúp", href: "/help" },
-  { name: "Đăng Xuất", href: "/logout" },
-];
+
 // /problems/a94e8c8e-69e3-4ada-92a7-22bfc159e9b3
 const EXCEPT_PATHS = [/^\/problems\/[a-f0-9-]+$/];
 const UserLayout = ({ children }: { children: React.ReactNode }) => {
@@ -50,21 +40,6 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
     return EXCEPT_PATHS.some((path) => path.test(pathname));
   }, [pathname]);
   const { data: session } = useSession();
-  const UserAvatar = () => (
-    <div className="flex items-center gap-2">
-      <img
-        className="h-8 w-8 rounded-full"
-        src={session?.user.image || "https://placewaifu.com/image/200/200"}
-        alt="User avatar"
-      />
-      <div className="hidden md:block">
-        <div className="text-sm font-medium text-gray-900">
-          {session?.user?.name}
-        </div>
-        {/* <div className="text-xs text-gray-500">200 Points</div> */}
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -138,22 +113,7 @@ const UserLayout = ({ children }: { children: React.ReactNode }) => {
               </div> */}
 
               {/* User Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger className="w-fit min-w-[180px] border-none">
-                  <UserAvatar />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-[200px]">
-                  {userNavigation.map((item) => (
-                    <DropdownMenuItem
-                      key={item.name}
-                      asChild
-                      className="cursor-pointer hover:bg-gray-100"
-                    >
-                      <Link href={item.href}>{item.name}</Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <UserMenu session={session} />
             </div>
           </div>
         </div>

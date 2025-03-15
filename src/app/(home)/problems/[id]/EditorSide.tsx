@@ -14,6 +14,8 @@ import { useTestcases } from "./_hooks/useTestcases";
 import { useProblemEditorContext } from "./context";
 import { trpc } from "@/trpc/react";
 import { RunCodeInput } from "@/server/schema/submission.dto";
+import { Can } from "@/app/_contexts/ability-context";
+import { Actions } from "@/constants/casl";
 
 export default function EditorSide({
   problem,
@@ -64,7 +66,14 @@ export default function EditorSide({
   };
 
   return (
-    <ResizablePanel defaultSize={50} minSize={45}>
+    <ResizablePanel defaultSize={50} minSize={45} className="relative">
+      <Can not I={Actions.CREATE} a="Submission">
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/25">
+          <div className="text-gray-500">
+            Bạn không có quyền truy cập vào phần này
+          </div>
+        </div>
+      </Can>
       <ResizablePanelGroup direction="vertical">
         <ResizablePanel defaultSize={93} minSize={50} ref={codePanelRef}>
           {/* Editor Toolbar */}
@@ -84,17 +93,23 @@ export default function EditorSide({
         <ResizableHandle />
 
         <ResizablePanel defaultSize={7} minSize={7} maxSize={50}>
-          <div className="flex items-center justify-center">
-            {/* Test Results Panel */}
-            <TestResultPanel
-              isOpen={isTestResultOpen}
-              onOpenChange={handleChangeCollapse}
-              testcases={testcases}
-              numberOfPassedTestcases={numberOfPassedTestcases}
-              totalTestcases={publicTestcases.length}
-              isPending={isPending}
-            />
-          </div>
+          <Can I={Actions.TRY} a="Submission" passThrough>
+            {(allow) => (
+              <div className="flex items-center justify-center">
+                {/* Test Results Panel */}
+                {allow && (
+                  <TestResultPanel
+                    isOpen={isTestResultOpen}
+                    onOpenChange={handleChangeCollapse}
+                    testcases={testcases}
+                    numberOfPassedTestcases={numberOfPassedTestcases}
+                    totalTestcases={publicTestcases.length}
+                    isPending={isPending}
+                  />
+                )}
+              </div>
+            )}
+          </Can>
         </ResizablePanel>
       </ResizablePanelGroup>
     </ResizablePanel>

@@ -4,7 +4,7 @@ import { readFileSync } from "fs";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 const prompt = readFileSync(
-  "E:/doantotnghie/code-master/src/constants/prompts/translate_tiptap.txt",
+  "C:/Users/BaoBao/Desktop/code-master/src/constants/prompts/translate_tiptap.txt",
   "utf-8",
 );
 

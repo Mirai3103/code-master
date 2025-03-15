@@ -15,6 +15,8 @@ import {
 } from "react-icons/lu";
 import { RiTestTubeFill as TestTube } from "react-icons/ri";
 import { LanguageOfProblem } from "../types";
+import { Can } from "@/app/_contexts/ability-context";
+import { Actions } from "@/constants/casl";
 
 interface EditorToolbarProps {
   selectedLanguage: string;
@@ -60,19 +62,31 @@ export function EditorToolbar({
           <Button variant="outline" size="icon">
             <Copy className="h-4 w-4" />
           </Button>
-          <Button
-            variant="outline"
-            className="gap-2"
-            onClick={onRunCode}
-            disabled={isPending}
-          >
-            <TestTube className="h-4 w-4" />
-            {isPending ? "Đang chạy..." : "Chạy thử"}
-          </Button>
-          <Button className="gap-2" onClick={onSubmitCode} disabled={isPending}>
-            <Check className="h-4 w-4" />
-            Nộp bài
-          </Button>
+          <Can I={Actions.TRY} a="Submission" passThrough>
+            {(allowed) => (
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={onRunCode}
+                disabled={isPending || !allowed}
+              >
+                <TestTube className="h-4 w-4" />
+                {isPending ? "Đang chạy..." : "Chạy thử"}
+              </Button>
+            )}
+          </Can>
+          <Can I={Actions.CREATE} a="Submission" passThrough>
+            {(allowed) => (
+              <Button
+                className="gap-2"
+                onClick={onSubmitCode}
+                disabled={isPending || !allowed}
+              >
+                <Check className="h-4 w-4" />
+                Nộp bài
+              </Button>
+            )}
+          </Can>
         </div>
       </div>
     </div>

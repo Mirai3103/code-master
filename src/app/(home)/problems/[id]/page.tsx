@@ -6,6 +6,9 @@ import EditorSide from "./EditorSide";
 import DetailSide from "./DetailSide";
 import { trpc } from "@/trpc/server";
 import { notFound } from "next/navigation";
+import { can } from "@/util/getCurrentUser";
+import { subject } from "@casl/ability";
+import { Actions } from "@/constants/casl";
 interface Props {
   params: Promise<{
     id: string;
@@ -25,6 +28,10 @@ const ProblemSolvingPage = async ({ params }: Props) => {
     publicTestcasesPromise,
   ]);
   if (!problem) {
+    notFound();
+  }
+  const canReadProblem = await can(Actions.READ, subject("Problem", problem));
+  if (!canReadProblem) {
     notFound();
   }
 

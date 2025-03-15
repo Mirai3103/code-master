@@ -25,6 +25,8 @@ import { Tag as ITag } from "@/server/schema/tag.schema";
 import { ScrollArea } from "@/app/_components/ui/scroll-area";
 import SubmissionProgressTab from "./_components/SubmissionTab";
 import SubmissionsTable from "./_components/SubmissionTable";
+import { Can } from "@/app/_contexts/ability-context";
+import { Actions } from "@/constants/casl";
 interface Props {
   problem: Problem & {
     problemTags: Partial<ITag & { tag: { tagName: string } }>[];
@@ -39,6 +41,7 @@ export default function DetailSide({ problem }: Props) {
       setHtml(generateHTML(problem!.problemStatement as never, [StarterKit]));
     }
   }, [isClient, problem]);
+
   return (
     <ResizablePanel defaultSize={50} collapsible minSize={30}>
       <ScrollArea className="scroll-area h-full border-r border-gray-200 bg-white">
@@ -80,22 +83,54 @@ export default function DetailSide({ problem }: Props) {
                 <FileText className="mr-2 h-4 w-4" />
                 Mô tả
               </TabsTrigger>
-              <TabsTrigger value="hints" className="flex-1">
-                <Zap className="mr-2 h-4 w-4" />
-                Gợi ý
-              </TabsTrigger>
-              <TabsTrigger value="history" className="flex-1">
-                <LuHistory className="mr-2 h-4 w-4" />
-                Lịch sử bài nộp
-              </TabsTrigger>
-              <TabsTrigger value="discussions" className="flex-1">
-                <Message className="mr-2 h-4 w-4" />
-                Thảo luận
-              </TabsTrigger>
-              <TabsTrigger value="submission" className="flex-1">
-                <Activity className="mr-2 h-4 w-4" />
-                Bài nộp
-              </TabsTrigger>
+              <Can I={Actions.READ_ANY} a="Hint" passThrough>
+                {(allowed) => (
+                  <TabsTrigger
+                    value="hints"
+                    className="flex-1"
+                    disabled={!allowed}
+                  >
+                    <Zap className="mr-2 h-4 w-4" />
+                    Gợi ý
+                  </TabsTrigger>
+                )}
+              </Can>
+              <Can I={Actions.READ_OWN} a="Submission" passThrough>
+                {(allowed) => (
+                  <TabsTrigger
+                    value="history"
+                    className="flex-1"
+                    disabled={!allowed}
+                  >
+                    <LuHistory className="mr-2 h-4 w-4" />
+                    Lịch sử bài nộp
+                  </TabsTrigger>
+                )}
+              </Can>
+              <Can I={Actions.READ_ANY} a="Discussion" passThrough>
+                {(allowed) => (
+                  <TabsTrigger
+                    value="discussion"
+                    className="flex-1"
+                    disabled={!allowed}
+                  >
+                    <Message className="mr-2 h-4 w-4" />
+                    Thảo luận
+                  </TabsTrigger>
+                )}
+              </Can>
+              <Can I={Actions.READ_ANY} a="Submission" passThrough>
+                {(allowed) => (
+                  <TabsTrigger
+                    value="submission"
+                    className="flex-1"
+                    disabled={!allowed}
+                  >
+                    <Activity className="mr-2 h-4 w-4" />
+                    Bài nộp
+                  </TabsTrigger>
+                )}
+              </Can>
             </TabsList>
 
             <TabsContent value="description" className="mt-4">

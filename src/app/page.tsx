@@ -10,8 +10,11 @@ import {
 } from "react-icons/lu";
 import React from "react";
 import Link from "next/link";
+import { auth } from "@/server/auth";
+import UserMenu from "./_components/user-menu";
 
-const LandingPage = () => {
+const LandingPage = async () => {
+  const session = await auth();
   return (
     <div className="min-h-screen bg-linear-to-b from-white to-blue-50">
       {/* Hero Section */}
@@ -41,13 +44,8 @@ const LandingPage = () => {
             >
               Thi Đấu
             </Button>
-            <Button
-              variant="outline"
-              className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
-              asChild
-            >
-              <Link href="/auth">Đăng Nhập</Link>
-            </Button>
+
+            <UserMenu session={session} />
           </div>
         </nav>
 

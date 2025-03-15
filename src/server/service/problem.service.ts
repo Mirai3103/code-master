@@ -31,7 +31,6 @@ export class ProblemService {
       }),
       ...(params.isPublic !== undefined && { isPublic: params.isPublic }),
     };
-    console.log(where);
 
     const [data, total] = await Promise.all([
       this.prisma.problem.findMany({
@@ -53,7 +52,6 @@ export class ProblemService {
       }),
       this.prisma.problem.count({ where }),
     ]);
-    console.log(data);
     const currentUserId = await getCurrentUser();
     if (currentUserId) {
       const userSubmissions = await this.prisma.submission.findMany({

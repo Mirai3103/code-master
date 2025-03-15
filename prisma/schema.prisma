@@ -118,10 +118,11 @@ model Role {
 }
 
 model Resource {
-  resourceId   String   @id @db.VarChar(100)
-  resourceName String   @unique
-  description  String?
-  fields       String[] @default([])
+  resourceId     String   @id @db.VarChar(100)
+  resourceName   String   @unique
+  description    String?
+  fields         String[] @default([])
+  validActionIds String[] @default(["read", "create", "update", "delete"])
 }
 
 model Action {

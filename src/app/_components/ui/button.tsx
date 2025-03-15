@@ -46,7 +46,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         className={cn(
-          props.disabled ? "cursor-not-allowed" : "",
+          props.disabled ? "pointer-events-auto cursor-not-allowed" : "",
           buttonVariants({ variant, size, className }),
         )}
         ref={ref}
