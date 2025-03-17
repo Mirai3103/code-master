@@ -202,7 +202,7 @@ export default function EditForm({ role }: IProp) {
             {form.formState.errors.rules && (
               <Alert variant="destructive">
                 <AlertDescription>
-                  {form.formState.errors.rules.message}
+                  {JSON.stringify(form.formState.errors.rules)}
                 </AlertDescription>
               </Alert>
             )}

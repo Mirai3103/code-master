@@ -3,9 +3,12 @@ import { v4 as uuid } from "uuid";
 import fs from "fs";
 import AdmZip from "adm-zip";
 import { type NewTestCaseInput } from "../schema/testcase.schema";
+import { db } from "../database";
 
 export class TestcaseService {
-  constructor(private prisma: PrismaClient) {
+  private prisma: PrismaClient;
+  constructor(prisma?: PrismaClient) {
+    this.prisma = prisma || db;
     // Tạo thư mục tạm nếu chưa tồn tại
     if (!fs.existsSync("./tmp")) {
       fs.mkdirSync("./tmp");

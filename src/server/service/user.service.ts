@@ -194,11 +194,19 @@ export class UserService extends AbstractService {
     if (!user) {
       throw new Error("User not found");
     }
-
+    const defaultRole = await this.prisma.role.findMany({
+      where: {
+        roleId: {
+          in: ["everyone", "loggedIn"],
+        },
+      },
+    });
+    const defaultRule = defaultRole.map((d) => d.rules || []).flat();
     const ruleList = user.Role.map((role) => role.rules).flat();
     if (user.rules) {
       ruleList.push(...(user.rules as JsonArray));
     }
+    ruleList.push(...defaultRule);
     return ruleList;
   }
 }

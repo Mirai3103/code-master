@@ -15,16 +15,7 @@ export enum Actions {
 }
 type CreateMongoAbilityFirstArg = Parameters<typeof createMongoAbility>[0];
 
-export const testAbility: CreateMongoAbilityFirstArg = [
-  {
-    action: Actions.READ_OWN,
-    subject: "Submission",
-  },
-  {
-    action: Actions.READ,
-    subject: "Problem",
-  },
-];
+export const testAbility: CreateMongoAbilityFirstArg = [];
 
 export const resolveAction = createAliasResolver({
   [Actions.READ_ANY]: ["read"],

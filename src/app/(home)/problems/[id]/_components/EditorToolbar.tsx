@@ -12,6 +12,7 @@ import {
   LuCode as Code,
   LuSettings as Settings,
   LuCopy as Copy,
+  LuLoader,
 } from "react-icons/lu";
 import { RiTestTubeFill as TestTube } from "react-icons/ri";
 import { LanguageOfProblem } from "../types";
@@ -82,8 +83,12 @@ export function EditorToolbar({
                 onClick={onSubmitCode}
                 disabled={isPending || !allowed}
               >
-                <Check className="h-4 w-4" />
-                Nộp bài
+                {isPending ? (
+                  <LuLoader className="h-4 w-4" />
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
+                {isPending ? "Đang nộp..." : "Nộp bài"}
               </Button>
             )}
           </Can>

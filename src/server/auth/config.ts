@@ -66,9 +66,6 @@ export const authConfig = {
           emailVerified: new Date(),
           image: data.image!,
           name: data.name!,
-          Role: {
-            connect: { roleId: "everyone" },
-          },
         },
       });
     },

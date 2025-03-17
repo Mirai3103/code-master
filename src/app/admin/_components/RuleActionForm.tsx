@@ -20,8 +20,13 @@ import {
   TooltipTrigger,
 } from "@/app/_components/ui/tooltip";
 import { FancyMultiSelect } from "@/app/_components/ui/fancy-multi-select";
-import { useState } from "react";
-import { DialogTitle, Dialog, DialogContent, DialogHeader } from "@/app/_components/ui/dialog";
+import React, { useState } from "react";
+import {
+  DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+} from "@/app/_components/ui/dialog";
 import ChooseRoles from "./ChooseRoles";
 
 interface IProps {
@@ -43,79 +48,38 @@ export default function RuleActionForm({
       mode == "edit"
         ? rule
         : {
-          action: [],
-          subject: [],
-          fields: undefined,
-          inverted: false,
-          condition: undefined,
-          reason: undefined,
-        },
+            action: [],
+            subject: [],
+            fields: undefined,
+            inverted: false,
+            condition: undefined,
+            reason: undefined,
+          },
   });
 
   const handleSubmit = (data: Rule) => {
     onSubmit(data);
     currentRuleForm.reset();
   };
+  const subjects = currentRuleForm.watch("subject");
+  const combinedActions = React.useMemo(() => {
+    if (!subjects || !actions || !resources) {
+      return [];
+    }
+    return subjects
+      ?.map((subject) => {
+        return resources?.find((resource) => resource.resourceId === subject)
+          ?.validActionIds;
+      })
+      .flat()
+      .map((actionId) => {
+        return actions?.find((action) => action.actionId === actionId);
+      });
+  }, [subjects, actions, resources]);
 
   return (
     <Form {...currentRuleForm}>
       <h3 className="font-semibold">Thêm quyền Mới</h3>
-      {/* Chọn Actions */}
-      <div className="space-y-2">
-        <FormField
-          control={currentRuleForm.control}
-          name="action"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Hành động (Actions)</FormLabel>
-
-              <FormControl>
-                <div>
-                  {actions?.map((action) => (
-                    <TooltipProvider key={action.actionId}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            type="button"
-                            variant={
-                              field.value.includes(action.actionId as any)
-                                ? "default"
-                                : "outline"
-                            }
-                            onClick={() => {
-                              if (
-                                field.value.includes(action.actionId as any)
-                              ) {
-                                field.onChange(
-                                  field.value.filter(
-                                    (a) => a !== action.actionId,
-                                  ),
-                                );
-                              } else {
-                                field.onChange([
-                                  ...field.value,
-                                  action.actionId,
-                                ]);
-                              }
-                            }}
-                            className="mx-1 capitalize"
-                          >
-                            {action.actionName}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{action.description || action.actionName}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  ))}
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
       {/* Chọn Subject */}
       <div className="space-y-2">
         <FormField
@@ -171,6 +135,62 @@ export default function RuleActionForm({
           )}
         />
       </div>
+      {/* Chọn Actions */}
+      <div className="space-y-2">
+        <FormField
+          control={currentRuleForm.control}
+          name="action"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Hành động (Actions)</FormLabel>
+
+              <FormControl>
+                <div>
+                  {combinedActions?.map((action) => (
+                    <TooltipProvider key={action?.actionId}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant={
+                              field.value.includes(action?.actionId as any)
+                                ? "default"
+                                : "outline"
+                            }
+                            onClick={() => {
+                              if (
+                                field.value.includes(action?.actionId as any)
+                              ) {
+                                field.onChange(
+                                  field.value.filter(
+                                    (a) => a !== action?.actionId,
+                                  ),
+                                );
+                              } else {
+                                field.onChange([
+                                  ...field.value,
+                                  action?.actionId,
+                                ]);
+                              }
+                            }}
+                            className="mx-1 capitalize"
+                          >
+                            {action?.actionName}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{action?.description || action?.actionName}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ))}
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
 
       {/* Chọn Fields */}
       {/* {currentSubject && (
@@ -212,20 +232,22 @@ export default function RuleActionForm({
         <LuCirclePlus className="mr-2 h-4 w-4" />
         Thêm Rule
       </Button>
-      <ImportRulesFromRolesModal onImport={(rules) => {
-        rules.forEach(rule => {
-          const newRule: Rule = {
-            ...rule,
-          } as Rule;
-          if (rule.action.constructor !== Array) {
-            newRule.action = [rule.action as any];
-          }
-          if (rule.subject.constructor !== Array) {
-            newRule.subject = [rule.subject as any];
-          }
-          handleSubmit(newRule);
-        })
-      }} />
+      <ImportRulesFromRolesModal
+        onImport={(rules) => {
+          rules.forEach((rule) => {
+            const newRule: Rule = {
+              ...rule,
+            } as Rule;
+            if (rule.action.constructor !== Array) {
+              newRule.action = [rule.action as any];
+            }
+            if (rule.subject.constructor !== Array) {
+              newRule.subject = [rule.subject as any];
+            }
+            handleSubmit(newRule);
+          });
+        }}
+      />
     </Form>
   );
 }
@@ -233,31 +255,40 @@ export default function RuleActionForm({
 interface IImportRulesFromRolesModalProps {
   onImport: (rules: Rule[]) => void;
 }
-function ImportRulesFromRolesModal({ onImport }: IImportRulesFromRolesModalProps) {
+function ImportRulesFromRolesModal({
+  onImport,
+}: IImportRulesFromRolesModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { mutateAsync } = trpc.roles.getRolesByIds.useMutation({});
 
   const handleImport = async (ids: string[]) => {
     const roles = await mutateAsync({ roleIds: ids });
-    onImport(roles.flatMap(role => role.rules as unknown as Rule[]));
+    onImport(roles.flatMap((role) => role.rules as unknown as Rule[]));
     setIsOpen(false);
-  }
+  };
   return (
     <>
-      <Button className="mt-4 ml-2" type="button" onClick={() => setIsOpen(true)} >
-        <LuImport className="mr-2 h-4 w-4" />
-        Nhập từ vai trò khác</Button>
-      <Dialog
-        open={isOpen}
-        onOpenChange={setIsOpen}
+      <Button
+        className="mt-4 ml-2"
+        type="button"
+        onClick={() => setIsOpen(true)}
       >
+        <LuImport className="mr-2 h-4 w-4" />
+        Nhập từ vai trò khác
+      </Button>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold">Đăng nhập</DialogTitle>
+            <DialogTitle className="text-lg font-semibold">
+              Đăng nhập
+            </DialogTitle>
           </DialogHeader>
-          <ChooseRoles onSubmit={handleImport} onCancel={() => setIsOpen(false)} />
+          <ChooseRoles
+            onSubmit={handleImport}
+            onCancel={() => setIsOpen(false)}
+          />
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

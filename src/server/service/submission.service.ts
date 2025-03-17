@@ -299,9 +299,7 @@ export class SubmissionService extends AbstractService {
       },
       orderBy: {
         testcase: {
-          isSample: "desc",
-          createdAt: "asc",
-          testCaseId: "asc",
+          label: "asc",
         },
       },
     });

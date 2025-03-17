@@ -13,6 +13,7 @@ export class PermissionService extends AbstractService {
         resourceName: true,
         fields: true,
         description: true,
+        validActionIds: true,
       },
     });
   }

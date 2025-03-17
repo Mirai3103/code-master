@@ -13,6 +13,7 @@ import {
   LuZap as Zap,
   LuActivity as Activity,
   LuHistory,
+  LuX,
 } from "react-icons/lu";
 import { ResizablePanel } from "@/app/_components/ui/resizable";
 import { Problem } from "@prisma/client";
@@ -27,6 +28,8 @@ import SubmissionProgressTab from "./_components/SubmissionTab";
 import SubmissionsTable from "./_components/SubmissionTable";
 import { Can } from "@/app/_contexts/ability-context";
 import { Actions } from "@/constants/casl";
+import { useSession } from "next-auth/react";
+import { useProblemEditorContext } from "./context";
 interface Props {
   problem: Problem & {
     problemTags: Partial<ITag & { tag: { tagName: string } }>[];
@@ -41,6 +44,9 @@ export default function DetailSide({ problem }: Props) {
       setHtml(generateHTML(problem!.problemStatement as never, [StarterKit]));
     }
   }, [isClient, problem]);
+  const session = useSession();
+  const { isShowSubmitTab, setTabValue, setIsShowSubmitTab, tabValue } =
+    useProblemEditorContext();
 
   return (
     <ResizablePanel defaultSize={50} collapsible minSize={30}>
@@ -49,7 +55,7 @@ export default function DetailSide({ problem }: Props) {
           <div className="mb-4 flex items-center justify-between">
             <h1 className="text-xl font-bold text-gray-900">{problem.title}</h1>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" disabled={!session.data}>
                 <Bookmark className="h-5 w-5" />
               </Button>
               <Button variant="ghost" size="icon">
@@ -77,13 +83,13 @@ export default function DetailSide({ problem }: Props) {
         </div>
 
         <div className="px-6 py-4">
-          <Tabs defaultValue="description" className="w-full">
+          <Tabs className="w-full" onValueChange={setTabValue} value={tabValue}>
             <TabsList className="w-full">
               <TabsTrigger value="description" className="flex-1">
                 <FileText className="mr-2 h-4 w-4" />
                 Mô tả
               </TabsTrigger>
-              <Can I={Actions.READ_ANY} a="Hint" passThrough>
+              <Can I={Actions.READ} a="Hint" passThrough>
                 {(allowed) => (
                   <TabsTrigger
                     value="hints"
@@ -119,18 +125,28 @@ export default function DetailSide({ problem }: Props) {
                   </TabsTrigger>
                 )}
               </Can>
-              <Can I={Actions.READ_ANY} a="Submission" passThrough>
+              {/* <Can I={Actions.READ_ANY} a="Submission" passThrough>
                 {(allowed) => (
-                  <TabsTrigger
-                    value="submission"
-                    className="flex-1"
-                    disabled={!allowed}
-                  >
-                    <Activity className="mr-2 h-4 w-4" />
-                    Bài nộp
-                  </TabsTrigger>
+                 
                 )}
-              </Can>
+              </Can>*/}{" "}
+              <TabsTrigger
+                value="submission"
+                className="flex-1"
+                hidden={!isShowSubmitTab}
+              >
+                <Activity className="mr-2 h-4 w-4" />
+                Bài nộp
+                <LuX
+                  className="ml-2 h-4 w-4"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setIsShowSubmitTab(false);
+                    setTabValue("description");
+                  }}
+                />
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="description" className="mt-4">

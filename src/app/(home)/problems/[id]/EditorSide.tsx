@@ -43,8 +43,9 @@ export default function EditorSide({
     });
 
   // Handle submit code - can be extended for actual submission
-  const { setIsShowSubmitTab, setSubmissionId } = useProblemEditorContext();
-  const { mutateAsync: submitCodeAsync } =
+  const { setIsShowSubmitTab, setSubmissionId, setTabValue } =
+    useProblemEditorContext();
+  const { mutateAsync: submitCodeAsync, isPending: isSubmitPending } =
     trpc.submissions.runCode.iterable.useMutation();
   const utils = trpc.useUtils();
   const handleSubmitCode = () => {
@@ -58,6 +59,7 @@ export default function EditorSide({
     };
     submitCodeAsync(payload).then(async (asyncGen) => {
       setIsShowSubmitTab(true);
+      setTabValue("submission");
       for await (const result of asyncGen) {
         setSubmissionId(result.submissionId);
         utils.submissions.getSubmissionById.invalidate(result.submissionId);
@@ -83,7 +85,7 @@ export default function EditorSide({
             languagesOfProblem={languagesOfProblem}
             onRunCode={handleSubmission}
             onSubmitCode={handleSubmitCode}
-            isPending={isPending}
+            isPending={isPending || isSubmitPending}
           />
 
           {/* Code Editor */}

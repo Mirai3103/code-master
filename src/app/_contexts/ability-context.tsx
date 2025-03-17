@@ -15,7 +15,7 @@ export default function AbilityProvider({
   children,
   rules,
 }: Readonly<{ children: React.ReactNode; rules: any }>) {
-  const ability = createMongoAbility(testAbility || [], {
+  const ability = createMongoAbility(rules || [], {
     resolveAction: resolveAction,
   });
   return (

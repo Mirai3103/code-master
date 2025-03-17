@@ -1,7 +1,5 @@
 import { Prisma } from "@prisma/client";
 
-import { getCurrentUser } from "@/util/getCurrentUser";
-
 // Tối ưu việc check model fields bằng Map
 const modelAuditFields = new Map<string, Set<string>>();
 
@@ -41,6 +39,7 @@ const addAuditFields = async (
   const fields = modelAuditFields.get(modelName);
 
   if (!fields) return data;
+  const { getCurrentUser } = await import("@/util/getCurrentUser");
   const currentUser = await getCurrentUser();
 
   const result = { ...data };

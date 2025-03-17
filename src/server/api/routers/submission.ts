@@ -3,11 +3,7 @@ import { type SubmissionResult } from "@/server/grpc/generated/execution_service
 import { runCodeInput } from "@/server/schema/submission.dto";
 import { type ClientReadableStream } from "@grpc/grpc-js";
 import { z } from "zod";
-function waitRandomTime() {
-  return new Promise((resolve) => {
-    setTimeout(resolve, Math.random() * 2000);
-  });
-}
+
 export const submissionRouter = createTRPCRouter({
   runCode: {
     iterable: publicProcedure.input(runCodeInput).mutation(async function* ({
@@ -21,7 +17,6 @@ export const submissionRouter = createTRPCRouter({
         await submission.testRunCode(input);
       let submissionId = "";
       for await (const response of readableStream) {
-        await waitRandomTime();
         const result = response as SubmissionResult;
         if (!input.isTest)
           await submission.updateSubmissionTestcaseResult(result);
