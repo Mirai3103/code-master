@@ -1,5 +1,5 @@
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { type SubmissionResult } from "@/server/grpc/generated/execution_service";
+import { type SubmissionResult } from "@/server/grpc/protos/execution_service";
 import { runCodeInput } from "@/server/schema/submission.dto";
 import { type ClientReadableStream } from "@grpc/grpc-js";
 import { z } from "zod";
@@ -21,15 +21,15 @@ export const submissionRouter = createTRPCRouter({
         if (!input.isTest)
           await submission.updateSubmissionTestcaseResult(result);
         if (submissionId === "") {
-          submissionId = result.submission_id;
+          submissionId = result.submissionId;
         }
         yield {
-          submissionId: result.submission_id,
-          testCaseId: result.test_case_id,
+          submissionId: result.submissionId,
+          testCaseId: result.testCaseId,
           status: result.status,
           stdout: result.stdout,
-          memoryUsage: result.memory_usage,
-          timeUsage: result.time_usage,
+          memoryUsage: result.memoryUsageInKb,
+          timeUsage: result.timeUsageInMs,
         };
       }
       if (!input.isTest) await submission.recalculateSubmission(submissionId);

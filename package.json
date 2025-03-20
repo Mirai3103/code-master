@@ -19,7 +19,8 @@
     "preview": "next build && next start",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "generate": "protoc --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts.exe --ts_out=src/server/grpc/generated --proto_path=src/server/grpc/protos src/server/grpc/protos/execution_service.proto &&  protoc -I=src/server/grpc/protos --ts_out=src/server/grpc/generated src/server/grpc/protos/execution_service.proto"
+    "generate": "protoc --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts.exe --ts_out=src/server/grpc/generated --proto_path=src/server/grpc/protos src/server/grpc/protos/execution_service.proto &&  protoc -I=src/server/grpc/protos --ts_out=src/server/grpc/generated src/server/grpc/protos/execution_service.proto",
+    "generate2": "protoc  --plugin=./node_modules/.bin/protoc-gen-ts_proto.exe  --ts_proto_out=. --ts_proto_opt=outputServices=grpc-js src/server/grpc/protos/execution_service.proto"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
@@ -155,6 +156,7 @@
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.2",
     "ts-proto": "^2.6.1",
+    "ts-protoc-gen": "^0.15.1-pre.a71b34e",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "zod-prisma-types": "^3.2.1"

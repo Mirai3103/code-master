@@ -2,12 +2,9 @@ import AbstractService from "./abstract.service";
 import { v4 as uuid } from "uuid";
 import {
   ExecutionServiceClient,
-  Language,
   Submission,
-  TestCase,
-  SubmissionSettings,
   SubmissionResult,
-} from "../grpc/generated/execution_service";
+} from "../grpc/protos/execution_service";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { RunCodeInput } from "../schema/submission.dto";
 import {
@@ -109,32 +106,31 @@ export class SubmissionService extends AbstractService {
     testCases: TestCaseData[],
   ): Submission {
     const submissionId = uuid();
-    return new Submission({
+    return {
       id: submissionId,
       code: input.code,
-      language: new Language({
-        binary_file_ext: languageConfig.language.binaryFileExt ?? "",
-        compile_command: languageConfig.language.compileCommand ?? "",
-        run_command: languageConfig.language.runCommand ?? "",
-        source_file_ext: languageConfig.language.sourceFileExt ?? "",
-      }),
-      memory_limit:
-        (languageConfig.memoryLimitInKb ?? problem.memoryLimitInKb) * 1024,
-      time_limit: languageConfig.timeLimitInMs ?? problem.timeLimitInMs,
-      test_cases: testCases.map(
-        (tc) =>
-          new TestCase({
-            id: tc.testCaseId,
-            input: tc.inputData ?? "",
-            expect_output: tc.expectedOutput ?? "",
-          }),
-      ),
-      settings: new SubmissionSettings({
-        with_case_sensitive: false,
-        with_trim: true,
-        with_whitespace: true,
-      }),
-    });
+      language: {
+        binaryFileExt: languageConfig.language.binaryFileExt ?? "",
+        compileCommand: languageConfig.language.compileCommand ?? "",
+        runCommand: languageConfig.language.runCommand ?? "",
+        sourceFileExt: languageConfig.language.sourceFileExt ?? "",
+      },
+      memoryLimitInKb:
+        languageConfig.memoryLimitInKb ?? problem.memoryLimitInKb,
+      timeLimitInMs: languageConfig.timeLimitInMs ?? problem.timeLimitInMs,
+      testCases: testCases.map((tc) => ({
+        id: tc.testCaseId,
+        input: tc.inputData ?? "",
+        expectOutput: tc.expectedOutput ?? "",
+        inputFile: "",
+        outputFile: "",
+      })),
+      settings: {
+        withCaseSensitive: false,
+        withTrim: true,
+        withWhitespace: true,
+      },
+    };
   }
 
   public async testRunCode(input: RunCodeInput) {
@@ -176,7 +172,7 @@ export class SubmissionService extends AbstractService {
     }
 
     // Execute submission
-    return this.executionServiceClient.Execute(submission);
+    return this.executionServiceClient.execute(submission);
   }
 
   public async initSubmissionTestcases(
@@ -318,25 +314,25 @@ export class SubmissionService extends AbstractService {
 
   public async updateSubmissionTestcaseResult(result: SubmissionResult) {
     const {
-      submission_id,
-      test_case_id,
+      submissionId,
+      testCaseId,
       status,
       stdout,
-      memory_usage,
-      time_usage,
+      memoryUsageInKb,
+      timeUsageInMs,
     } = result;
     return this.db.submissionTestcase.update({
       where: {
         submissionId_testcaseId: {
-          submissionId: submission_id,
-          testcaseId: test_case_id,
+          submissionId: submissionId,
+          testcaseId: testCaseId,
         },
       },
       data: {
         status,
         stdout,
-        memoryUsedInKb: memory_usage,
-        runtimeInMs: time_usage * 1000,
+        memoryUsedInKb: memoryUsageInKb,
+        runtimeInMs: timeUsageInMs,
       },
     });
   }
